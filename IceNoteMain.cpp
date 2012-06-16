@@ -45,7 +45,9 @@ wxString wxbuildinfo(wxbuildinfoformat format)
 
 //(*IdInit(IceNoteFrame)
 const long IceNoteFrame::ID_TREECTRL = wxNewId();
-const long IceNoteFrame::ID_RICHTEXTCTRL = wxNewId();
+const long IceNoteFrame::ID_PANEL1 = wxNewId();
+const long IceNoteFrame::ID_RICHTEXTCTRL1 = wxNewId();
+const long IceNoteFrame::ID_SPLITTERWINDOW1 = wxNewId();
 const long IceNoteFrame::ID_SPLITTERWINDOW = wxNewId();
 const long IceNoteFrame::idMenuCreateNote = wxNewId();
 const long IceNoteFrame::idMenuCreateNotebook = wxNewId();
@@ -83,20 +85,43 @@ IceNoteFrame::IceNoteFrame(wxWindow* parent,wxWindowID id)
     //(*Initialize(IceNoteFrame)
     wxMenu* Menu1;
     wxMenuItem* mnQuit;
+    wxGridSizer* GridSizer1;
     wxMenu* Menu2;
     wxMenuItem* mnAbout;
     wxMenuBar* menuBar;
 
-    Create(parent, id, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("id"));
+    Create(parent, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(935,460));
     listEditSplitter = new wxSplitterWindow(this, ID_SPLITTERWINDOW, wxPoint(200,224), wxDefaultSize, wxSP_3D|wxFULL_REPAINT_ON_RESIZE, _T("ID_SPLITTERWINDOW"));
-    listEditSplitter->SetMinimumPaneSize(150);
-    //listEditSplitter->SetSashGravity(0.5);
+    listEditSplitter->SetMinSize(wxSize(100,100));
+    listEditSplitter->SetMinimumPaneSize(100);
+    listEditSplitter->SetSashGravity(0.5);
     noteTree = new wxTreeCtrl(listEditSplitter, ID_TREECTRL, wxPoint(87,231), wxDefaultSize, wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL"));
-    mainText = new wxRichTextCtrl(listEditSplitter, ID_RICHTEXTCTRL, wxEmptyString, wxPoint(830,175), wxDefaultSize, wxRE_MULTILINE, wxDefaultValidator, _T("ID_RICHTEXTCTRL"));
+    wxTreeItemId noteTree_Item1 = noteTree->AddRoot(_T("root"));
+    wxTreeItemId noteTree_Item2 = noteTree->AppendItem(noteTree_Item1, _T("item 1"));
+    wxTreeItemId noteTree_Item3 = noteTree->AppendItem(noteTree_Item1, _T("item 2"));
+    wxTreeItemId noteTree_Item4 = noteTree->AppendItem(noteTree_Item1, _T("item 3"));
+    wxTreeItemId noteTree_Item5 = noteTree->AppendItem(noteTree_Item1, _T("item 4"));
+    wxTreeItemId noteTree_Item6 = noteTree->AppendItem(noteTree_Item5, _T("item 7"));
+    wxTreeItemId noteTree_Item7 = noteTree->AppendItem(noteTree_Item6, _T("item 10"));
+    wxTreeItemId noteTree_Item8 = noteTree->AppendItem(noteTree_Item5, _T("item 8"));
+    wxTreeItemId noteTree_Item9 = noteTree->AppendItem(noteTree_Item5, _T("item 9"));
+    wxTreeItemId noteTree_Item10 = noteTree->AppendItem(noteTree_Item1, _T("item 5"));
+    wxTreeItemId noteTree_Item11 = noteTree->AppendItem(noteTree_Item1, _T("item 6"));
+    noteTree->ScrollTo(noteTree_Item2);
+    SplitterWindow1 = new wxSplitterWindow(listEditSplitter, ID_SPLITTERWINDOW1, wxDefaultPosition, wxDefaultSize, wxSP_3D, _T("ID_SPLITTERWINDOW1"));
+    SplitterWindow1->SetMinimumPaneSize(10);
+    SplitterWindow1->SetSashGravity(0.5);
+    Panel1 = new wxPanel(SplitterWindow1, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
+    GridSizer1 = new wxGridSizer(2, 4, 0, 0);
+    Panel1->SetSizer(GridSizer1);
+    GridSizer1->Fit(Panel1);
+    GridSizer1->SetSizeHints(Panel1);
+    RichTextCtrl1 = new wxRichTextCtrl(SplitterWindow1, ID_RICHTEXTCTRL1, _("Text"), wxDefaultPosition, wxDefaultSize, wxRE_MULTILINE, wxDefaultValidator, _T("ID_RICHTEXTCTRL1"));
     	wxRichTextAttr rchtxtAttr_1;
-    listEditSplitter->SplitVertically(noteTree, mainText, 100);
-    //listEditSplitter->SetSashPosition(200);
+    SplitterWindow1->SplitHorizontally(Panel1, RichTextCtrl1);
+    listEditSplitter->SplitVertically(noteTree, SplitterWindow1);
+    listEditSplitter->SetSashPosition(200);
     menuBar = new wxMenuBar();
     Menu1 = new wxMenu();
     mnCreateNote = new wxMenuItem(Menu1, idMenuCreateNote, _("Create a note"), wxEmptyString, wxITEM_NORMAL);
@@ -235,5 +260,9 @@ bool IceNoteFrame::ProcessEvent(wxEvent& event)
 }
 
 void IceNoteFrame::OnMenuItem3Selected(wxCommandEvent& event)
+{
+}
+
+void IceNoteFrame::OnnoteTreeBeginDrag(wxTreeEvent& event)
 {
 }

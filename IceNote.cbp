@@ -112,6 +112,12 @@
 		<Unit filename="IceNoteApp.h" />
 		<Unit filename="IceNoteMain.cpp" />
 		<Unit filename="IceNoteMain.h" />
+		<Unit filename="NoteFileHandler.cpp" />
+		<Unit filename="NoteFileHandler.h" />
+		<Unit filename="NoteItemAbstract.cpp" />
+		<Unit filename="NoteItemAbstract.h" />
+		<Unit filename="NoteRelation.cpp" />
+		<Unit filename="NoteRelation.h" />
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
