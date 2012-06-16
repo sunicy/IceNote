@@ -59,7 +59,11 @@
 				<Linker>
 					<Add option="-s" />
 					<Add library="libwxmsw29u_richtext.a" />
+					<Add library="libwxmsw29u_xrc.a" />
+					<Add library="libwxmsw29u_aui.a" />
+					<Add library="libwxmsw29u_media.a" />
 					<Add library="libwxbase29u_net.a" />
+					<Add library="libwxmsw29u_gl.a" />
 					<Add library="libwxbase29u_xml.a" />
 					<Add library="libwxmsw29u_adv.a" />
 					<Add library="libwxmsw29u_html.a" />
@@ -70,6 +74,7 @@
 					<Add library="libwxtiff.a" />
 					<Add library="libwxzlib.a" />
 					<Add library="libwxregexu.a" />
+					<Add library="libwxexpat.a" />
 					<Add directory="$(#wx)\lib\gcc_lib" />
 				</Linker>
 			</Target>
@@ -102,7 +107,6 @@
 			<Add library="libuuid.a" />
 			<Add library="libcomctl32.a" />
 			<Add library="libwsock32.a" />
-			<Add library="libodbc32.a" />
 		</Linker>
 		<Unit filename="IceNoteApp.cpp" />
 		<Unit filename="IceNoteApp.h" />

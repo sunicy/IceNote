@@ -11,8 +11,11 @@
 #define ICENOTEMAIN_H
 
 //(*Headers(IceNoteFrame)
+#include <wx/treectrl.h>
 #include <wx/menu.h>
+#include <wx/splitter.h>
 #include <wx/toolbar.h>
+#include <wx/richtext/richtextctrl.h>
 #include <wx/frame.h>
 #include <wx/statusbr.h>
 //*)
@@ -25,15 +28,20 @@ class IceNoteFrame: public wxFrame
         virtual ~IceNoteFrame();
 
     private:
+        bool ProcessEvent(wxEvent& event);
 
         //(*Handlers(IceNoteFrame)
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);
         void OnClose(wxCloseEvent& event);
         void OnRichTextCtrlPaint(wxPaintEvent& event);
+        void OnMenuItem3Selected(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(IceNoteFrame)
+        static const long ID_TREECTRL;
+        static const long ID_RICHTEXTCTRL;
+        static const long ID_SPLITTERWINDOW;
         static const long idMenuCreateNote;
         static const long idMenuCreateNotebook;
         static const long idMenuExport;
@@ -61,29 +69,32 @@ class IceNoteFrame: public wxFrame
         //*)
 
         //(*Declarations(IceNoteFrame)
-        wxMenuItem* MenuItem8;
-        wxMenuItem* MenuItem7;
-        wxMenuItem* MenuItem5;
+        wxMenuItem* mnCopy;
+        wxRichTextCtrl* mainText;
+        wxMenuItem* mnAddPicture;
+        wxMenuItem* mnCut;
+        wxMenuItem* mnParaCenter;
+        wxMenuItem* mnStyle;
         wxToolBar* toolBar;
         wxMenu* Menu3;
-        wxMenuItem* MenuItem4;
-        wxMenuItem* MenuItem14;
-        wxMenuItem* MenuItem11;
-        wxMenuItem* MenuItem15;
-        wxMenuItem* MenuItem22;
-        wxMenuItem* MenuItem13;
-        wxMenuItem* MenuItem10;
-        wxMenuItem* MenuItem12;
-        wxMenuItem* MenuItem3;
-        wxMenuItem* MenuItem20;
-        wxMenuItem* MenuItem6;
+        wxMenuItem* mnImport;
+        wxMenuItem* mnParaRight;
+        wxMenuItem* mnCreateNote;
+        wxMenuItem* mnUndo;
+        wxMenuItem* mnParaLeft;
+        wxMenuItem* mnExport;
+        wxMenuItem* mnRedo;
+        wxMenuItem* mnParaDecIndent;
+        wxMenuItem* mnCreateNotebook;
+        wxMenuItem* mnParaIncIndent;
         wxStatusBar* statusBar;
-        wxMenuItem* MenuItem21;
-        wxMenuItem* MenuItem16;
-        wxMenuItem* MenuItem9;
-        wxMenuItem* MenuItem18;
+        wxTreeCtrl* noteTree;
+        wxMenuItem* mnPaste;
+        wxSplitterWindow* listEditSplitter;
+        wxMenuItem* mnWordCount;
+        wxMenuItem* mnImportText;
         wxMenu* Menu4;
-        wxMenuItem* MenuItem19;
+        wxMenuItem* mnSelectAll;
         wxMenu* MenuItem17;
         //*)
 

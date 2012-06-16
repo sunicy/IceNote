@@ -2,23 +2,46 @@
 <wxsmith>
 	<object class="wxFrame" name="IceNoteFrame">
 		<size>935,460</size>
+		<object class="wxSplitterWindow" name="ID_SPLITTERWINDOW" variable="listEditSplitter" member="yes">
+			<sashpos>200</sashpos>
+			<minsize>100</minsize>
+			<orientation>vertical</orientation>
+			<pos>200,224</pos>
+			<style>wxSP_3D|wxFULL_REPAINT_ON_RESIZE</style>
+			<object class="wxTreeCtrl" name="ID_TREECTRL" variable="noteTree" member="yes">
+				<image_list>&lt;none&gt;</image_list>
+				<tree_items>
+					<item>noteTree</item>
+					<item>&lt;none&gt;</item>
+				</tree_items>
+				<items_text>
+					<item2>noteTree</item2>
+					<item2>&lt;none&gt;</item2>
+				</items_text>
+				<pos>87,231</pos>
+			</object>
+			<object class="wxRichTextCtrl" name="ID_RICHTEXTCTRL" variable="mainText" member="yes">
+				<pos>830,175</pos>
+			</object>
+		</object>
 		<object class="wxMenuBar" variable="menuBar" member="no">
 			<object class="wxMenu" variable="Menu1" member="no">
 				<label>&amp;File</label>
-				<object class="wxMenuItem" name="idMenuCreateNote" variable="MenuItem3" member="yes">
+				<object class="wxMenuItem" name="idMenuCreateNote" variable="mnCreateNote" member="yes">
 					<label>Create a note</label>
+					<handler function="OnMenuItem3Selected" entry="EVT_MENU" />
 				</object>
-				<object class="wxMenuItem" name="idMenuCreateNotebook" variable="MenuItem4" member="yes">
+				<object class="wxMenuItem" name="idMenuCreateNotebook" variable="mnCreateNotebook" member="yes">
 					<label>Create a notebook</label>
 				</object>
 				<object class="separator" />
-				<object class="wxMenuItem" name="idMenuExport" variable="MenuItem5" member="yes">
+				<object class="wxMenuItem" name="idMenuExport" variable="mnExport" member="yes">
 					<label>Export...</label>
 				</object>
-				<object class="wxMenuItem" name="idMenuImport" variable="MenuItem6" member="yes">
+				<object class="wxMenuItem" name="idMenuImport" variable="mnImport" member="yes">
 					<label>Import...</label>
 				</object>
-				<object class="wxMenuItem" name="idMenuQuit" variable="MenuItem1" member="no">
+				<object class="wxMenuItem" name="idMenuQuit" variable="mnQuit" member="no">
 					<label>Quit</label>
 					<accel>Alt-F4</accel>
 					<help>Quit the application</help>
@@ -27,71 +50,71 @@
 			</object>
 			<object class="wxMenu" variable="Menu3" member="yes">
 				<label>&amp;Edit</label>
-				<object class="wxMenuItem" name="idMenuUndo" variable="MenuItem7" member="yes">
+				<object class="wxMenuItem" name="idMenuUndo" variable="mnUndo" member="yes">
 					<label>Undo</label>
 					<accel>Ctrl+Z</accel>
 				</object>
-				<object class="wxMenuItem" name="idMenuRedo" variable="MenuItem8" member="yes">
+				<object class="wxMenuItem" name="idMenuRedo" variable="mnRedo" member="yes">
 					<label>Redo</label>
 					<accel>Ctrl+Y</accel>
 				</object>
 				<object class="separator" />
-				<object class="wxMenuItem" name="idMenuCut" variable="MenuItem9" member="yes">
+				<object class="wxMenuItem" name="idMenuCut" variable="mnCut" member="yes">
 					<label>Cut</label>
 					<accel>Ctrl+X</accel>
 				</object>
-				<object class="wxMenuItem" name="idMenuCopy" variable="MenuItem10" member="yes">
+				<object class="wxMenuItem" name="idMenuCopy" variable="mnCopy" member="yes">
 					<label>Copy</label>
 					<accel>Ctrl+C</accel>
 				</object>
-				<object class="wxMenuItem" name="idMenuPaste" variable="MenuItem11" member="yes">
+				<object class="wxMenuItem" name="idMenuPaste" variable="mnPaste" member="yes">
 					<label>Paste</label>
 					<accel>Ctrl+V</accel>
 				</object>
-				<object class="wxMenuItem" name="idMenuSelectAll" variable="MenuItem12" member="yes">
+				<object class="wxMenuItem" name="idMenuSelectAll" variable="mnSelectAll" member="yes">
 					<label>Select &amp;All</label>
 					<accel>Ctrl+A</accel>
 				</object>
 				<object class="separator" />
-				<object class="wxMenuItem" name="idMenuWordCount" variable="MenuItem13" member="yes">
+				<object class="wxMenuItem" name="idMenuWordCount" variable="mnWordCount" member="yes">
 					<label>Word Count...</label>
 				</object>
 				<object class="separator" />
-				<object class="wxMenuItem" name="idMenuAddPicture" variable="MenuItem14" member="yes">
+				<object class="wxMenuItem" name="idMenuAddPicture" variable="mnAddPicture" member="yes">
 					<label>Add a picture...</label>
 				</object>
-				<object class="wxMenuItem" name="idMenuImportText" variable="MenuItem15" member="yes">
+				<object class="wxMenuItem" name="idMenuImportText" variable="mnImportText" member="yes">
 					<label>Import text...</label>
 				</object>
 			</object>
 			<object class="wxMenu" variable="Menu4" member="yes">
 				<label>&amp;Format</label>
-				<object class="wxMenuItem" name="idMenuStyle" variable="MenuItem16" member="yes">
+				<object class="wxMenuItem" name="idMenuStyle" variable="mnStyle" member="yes">
 					<label>&amp;Style...</label>
 				</object>
 				<object class="wxMenu" name="ID_MENUITEM1" variable="MenuItem17" member="yes">
 					<label>&amp;Paragraph</label>
-					<object class="wxMenuItem" name="idMenuAlignLeft" variable="MenuItem18" member="yes">
+					<object class="wxMenuItem" name="idMenuAlignLeft" variable="mnParaLeft" member="yes">
 						<label>Left</label>
 					</object>
-					<object class="wxMenuItem" name="idMenuAlignCenter" variable="MenuItem19" member="yes">
+					<object class="wxMenuItem" name="idMenuAlignCenter" variable="mnParaCenter" member="yes">
 						<label>Center</label>
 					</object>
-					<object class="wxMenuItem" name="idMenuAlignRight" variable="MenuItem20" member="yes">
+					<object class="wxMenuItem" name="idMenuAlignRight" variable="mnParaRight" member="yes">
 						<label>Right</label>
 					</object>
 					<object class="separator" />
-					<object class="wxMenuItem" name="idMenuIncIndent" variable="MenuItem21" member="yes">
+					<object class="wxMenuItem" name="idMenuIncIndent" variable="mnParaIncIndent" member="yes">
 						<label>Increse Indent</label>
 					</object>
-					<object class="wxMenuItem" name="idMenuDecIndent" variable="MenuItem22" member="yes">
+					<object class="wxMenuItem" name="idMenuDecIndent" variable="mnParaDecIndent" member="yes">
 						<label>Decrease Indent</label>
 					</object>
 				</object>
 			</object>
 			<object class="wxMenu" variable="Menu2" member="no">
 				<label>Help</label>
-				<object class="wxMenuItem" name="idMenuAbout" variable="MenuItem2" member="no">
+				<object class="wxMenuItem" name="idMenuAbout" variable="mnAbout" member="no">
 					<label>About</label>
 					<accel>F1</accel>
 					<help>Show info about this application</help>
