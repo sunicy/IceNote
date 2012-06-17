@@ -1,47 +1,173 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxFrame" name="IceNoteFrame">
-		<size>935,460</size>
+		<size>946,478</size>
+		<id_arg>0</id_arg>
 		<object class="wxSplitterWindow" name="ID_SPLITTERWINDOW" variable="listEditSplitter" member="yes">
 			<sashpos>200</sashpos>
+			<sashgravity>0.000000</sashgravity>
 			<minsize>100</minsize>
 			<orientation>vertical</orientation>
 			<pos>200,224</pos>
-			<style>wxSP_3D|wxFULL_REPAINT_ON_RESIZE</style>
+			<minsize>100,100</minsize>
+			<style>wxSP_LIVE_UPDATE|wxFULL_REPAINT_ON_RESIZE</style>
 			<object class="wxTreeCtrl" name="ID_TREECTRL" variable="noteTree" member="yes">
 				<image_list>&lt;none&gt;</image_list>
 				<tree_items>
 					<item>noteTree</item>
 					<item>&lt;none&gt;</item>
+					<item>0,#000000,0,-1,-1,-1,-1,Notebooks</item>
+					<item>1,#000000,0,-1,-1,-1,-1,item 1</item>
+					<item>1,#000000,0,-1,-1,-1,-1,item 2</item>
+					<item>1,#000000,0,-1,-1,-1,-1,item 3</item>
+					<item>1,#000000,0,-1,-1,-1,-1,item 4</item>
+					<item>2,#000000,0,-1,-1,-1,-1,item 7</item>
+					<item>3,#000000,0,-1,-1,-1,-1,item 10</item>
+					<item>2,#000000,0,-1,-1,-1,-1,item 8</item>
+					<item>2,#000000,0,-1,-1,-1,-1,item 9</item>
+					<item>1,#000000,0,-1,-1,-1,-1,item 5</item>
+					<item>1,#000000,0,-1,-1,-1,-1,item 6</item>
 				</tree_items>
 				<items_text>
 					<item2>noteTree</item2>
 					<item2>&lt;none&gt;</item2>
+					<item2>0,#000000,0,-1,-1,-1,-1,Notebooks</item2>
+					<item2>1,#000000,0,-1,-1,-1,-1,item 1</item2>
+					<item2>1,#000000,0,-1,-1,-1,-1,item 2</item2>
+					<item2>1,#000000,0,-1,-1,-1,-1,item 3</item2>
+					<item2>1,#000000,0,-1,-1,-1,-1,item 4</item2>
+					<item2>2,#000000,0,-1,-1,-1,-1,item 7</item2>
+					<item2>3,#000000,0,-1,-1,-1,-1,item 10</item2>
+					<item2>2,#000000,0,-1,-1,-1,-1,item 8</item2>
+					<item2>2,#000000,0,-1,-1,-1,-1,item 9</item2>
+					<item2>1,#000000,0,-1,-1,-1,-1,item 5</item2>
+					<item2>1,#000000,0,-1,-1,-1,-1,item 6</item2>
 				</items_text>
 				<pos>87,231</pos>
+				<hidden>1</hidden>
+				<style>wxTR_TWIST_BUTTONS|wxTR_NO_LINES|wxTR_DEFAULT_STYLE</style>
 			</object>
-			<object class="wxRichTextCtrl" name="ID_RICHTEXTCTRL" variable="mainText" member="yes">
-				<pos>830,175</pos>
+			<object class="wxSplitterWindow" name="ID_SPLITTERWINDOW1" variable="SplitterWindow1" member="yes">
+				<sashpos>100</sashpos>
+				<sashgravity>0.000000</sashgravity>
+				<minsize>100</minsize>
+				<pos>890,151</pos>
+				<minsize>100,100</minsize>
+				<style>wxNO_BORDER</style>
+				<object class="wxPanel" name="ID_PANEL3" variable="Panel3" member="yes">
+					<minsize>-1,150</minsize>
+					<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+						<cols>2</cols>
+						<rows>4</rows>
+						<growablecols>1</growablecols>
+						<object class="sizeritem">
+							<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+								<label>Title</label>
+								<size>64,18</size>
+								<style>wxALIGN_RIGHT</style>
+							</object>
+							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+						<object class="sizeritem">
+							<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="m_edtTitle" member="yes">
+								<size>560,22</size>
+								<minsize>-1,22</minsize>
+								<maxsize>-1,22</maxsize>
+							</object>
+							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+						<object class="sizeritem">
+							<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+								<label>Tags</label>
+								<size>64,18</size>
+								<style>wxALIGN_RIGHT</style>
+							</object>
+							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+						<object class="sizeritem">
+							<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="m_edtTags" member="yes">
+								<size>560,22</size>
+								<minsize>-1,22</minsize>
+								<maxsize>-1,22</maxsize>
+							</object>
+							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+						<object class="sizeritem">
+							<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
+								<label>Created Time</label>
+								<size>80,18</size>
+								<style>wxALIGN_RIGHT</style>
+							</object>
+							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+						<object class="sizeritem">
+							<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="m_edtCreatedTime" member="yes">
+								<size>560,22</size>
+								<style>wxTE_READONLY</style>
+							</object>
+							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+						<object class="sizeritem">
+							<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
+								<label>Last Modified</label>
+							</object>
+							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+						<object class="sizeritem">
+							<object class="wxTextCtrl" name="ID_TEXTCTRL4" variable="m_edtLastModified" member="yes">
+								<size>560,22</size>
+								<style>wxTE_READONLY</style>
+							</object>
+							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+					</object>
+				</object>
+				<object class="wxRichTextCtrl" name="ID_RICHTEXTCTRL1" variable="m_richTextCtrl" member="yes">
+					<pos>252,315</pos>
+					<style>wxWANTS_CHARS|wxVSCROLL|wxHSCROLL</style>
+				</object>
 			</object>
 		</object>
 		<object class="wxMenuBar" variable="menuBar" member="no">
 			<object class="wxMenu" variable="Menu1" member="no">
 				<label>&amp;File</label>
-				<object class="wxMenuItem" name="idMenuCreateNote" variable="mnCreateNote" member="yes">
+				<object class="wxMenuItem" name="ID_NEW_NOTEBOOK" variable="mnCreateNotebook" member="yes">
+					<label>Create a notebook</label>
+					<bitmap>I:\IceNote\res\new-notebook.png</bitmap>
+				</object>
+				<object class="wxMenuItem" name="ID_NEW_NOTE" variable="mnCreateNote" member="yes">
 					<label>Create a note</label>
+					<accel>Ctrl+N</accel>
+					<bitmap>I:\IceNote\res\new-note.png</bitmap>
 					<handler function="OnMenuItem3Selected" entry="EVT_MENU" />
 				</object>
-				<object class="wxMenuItem" name="idMenuCreateNotebook" variable="mnCreateNotebook" member="yes">
-					<label>Create a notebook</label>
+				<object class="wxMenuItem" name="ID_DEL_NOTE" variable="MenuItem1" member="yes">
+					<label>Remove Note/Notebook</label>
 				</object>
 				<object class="separator" />
-				<object class="wxMenuItem" name="idMenuExport" variable="mnExport" member="yes">
+				<object class="wxMenuItem" name="ID_EXPORT" variable="mnExport" member="yes">
 					<label>Export...</label>
 				</object>
-				<object class="wxMenuItem" name="idMenuImport" variable="mnImport" member="yes">
+				<object class="wxMenuItem" name="ID_IMPORT" variable="mnImport" member="yes">
 					<label>Import...</label>
 				</object>
-				<object class="wxMenuItem" name="idMenuQuit" variable="mnQuit" member="no">
+				<object class="wxMenuItem" name="ID_QUIT" variable="mnQuit" member="no">
 					<label>Quit</label>
 					<accel>Alt-F4</accel>
 					<help>Quit the application</help>
@@ -50,11 +176,11 @@
 			</object>
 			<object class="wxMenu" variable="Menu3" member="yes">
 				<label>&amp;Edit</label>
-				<object class="wxMenuItem" name="idMenuUndo" variable="mnUndo" member="yes">
+				<object class="wxMenuItem" name="wxID_UNDO" variable="mnUndo" member="yes">
 					<label>Undo</label>
 					<accel>Ctrl+Z</accel>
 				</object>
-				<object class="wxMenuItem" name="idMenuRedo" variable="mnRedo" member="yes">
+				<object class="wxMenuItem" name="wxID_REDO" variable="mnRedo" member="yes">
 					<label>Redo</label>
 					<accel>Ctrl+Y</accel>
 				</object>
@@ -89,25 +215,25 @@
 			</object>
 			<object class="wxMenu" variable="Menu4" member="yes">
 				<label>&amp;Format</label>
-				<object class="wxMenuItem" name="idMenuStyle" variable="mnStyle" member="yes">
-					<label>&amp;Style...</label>
+				<object class="wxMenuItem" name="ID_STYLESHEET" variable="mnStyle" member="yes">
+					<label>&amp;Style sheet...</label>
 				</object>
 				<object class="wxMenu" name="ID_MENUITEM1" variable="MenuItem17" member="yes">
 					<label>&amp;Paragraph</label>
-					<object class="wxMenuItem" name="idMenuAlignLeft" variable="mnParaLeft" member="yes">
+					<object class="wxMenuItem" name="ID_TEXT_ALIGNMENT_LEFT" variable="mnParaLeft" member="yes">
 						<label>Left</label>
 					</object>
-					<object class="wxMenuItem" name="idMenuAlignCenter" variable="mnParaCenter" member="yes">
+					<object class="wxMenuItem" name="ID_TEXT_ALIGNMENT_CENTER" variable="mnParaCenter" member="yes">
 						<label>Center</label>
 					</object>
-					<object class="wxMenuItem" name="idMenuAlignRight" variable="mnParaRight" member="yes">
+					<object class="wxMenuItem" name="ID_TEXT_ALIGNMENT_RIGHT" variable="mnParaRight" member="yes">
 						<label>Right</label>
 					</object>
 					<object class="separator" />
-					<object class="wxMenuItem" name="idMenuIncIndent" variable="mnParaIncIndent" member="yes">
+					<object class="wxMenuItem" name="ID_INC_INDENT" variable="mnParaIncIndent" member="yes">
 						<label>Increse Indent</label>
 					</object>
-					<object class="wxMenuItem" name="idMenuDecIndent" variable="mnParaDecIndent" member="yes">
+					<object class="wxMenuItem" name="ID_DEC_INDENT" variable="mnParaDecIndent" member="yes">
 						<label>Decrease Indent</label>
 					</object>
 				</object>
@@ -127,6 +253,70 @@
 			<widths>-1</widths>
 			<styles>wxSB_NORMAL</styles>
 		</object>
-		<object class="wxToolBar" name="ID_TOOLBAR1" variable="toolBar" member="yes" />
+		<object class="wxToolBar" name="ID_TOOLBAR1" variable="toolBar" member="yes">
+			<object class="tool" name="ID_TOOLBARITEM1" variable="ToolBarItem1" member="yes">
+				<label>Create a notebook</label>
+				<bitmap>res/new-notebook.png</bitmap>
+				<tooltip>Create a notebook</tooltip>
+			</object>
+			<object class="tool" name="ID_TOOLBARITEM2" variable="ToolBarItem2" member="yes">
+				<label>Create a Note</label>
+				<bitmap>res/new-note.png</bitmap>
+				<tooltip>Create a Note</tooltip>
+			</object>
+			<object class="tool" name="ID_TOOLBARITEM7" variable="ToolBarItem3" member="yes">
+				<label>Delete a note</label>
+				<bitmap>res/delete.png</bitmap>
+				<tooltip>Delete a note</tooltip>
+			</object>
+			<object class="separator" />
+			<object class="tool" name="wxID_UNDO" variable="ToolBarItem4" member="yes">
+				<label>Undo</label>
+				<bitmap>res\undo.png</bitmap>
+				<tooltip>Undo the last action</tooltip>
+			</object>
+			<object class="tool" name="wxID_REDO" variable="ToolBarItem5" member="yes">
+				<label>Redo</label>
+				<bitmap>res\redo.png</bitmap>
+				<tooltip>Redo the last action</tooltip>
+			</object>
+			<object class="separator" />
+			<object class="tool" name="ID_BOLD" variable="ToolBarItem6" member="yes">
+				<label>Bold</label>
+				<bitmap>res\bold.png</bitmap>
+				<tooltip>Bold</tooltip>
+			</object>
+			<object class="tool" name="ID_ITALIC" variable="ToolBarItem7" member="yes">
+				<label>Italic</label>
+				<bitmap>res\italic.png</bitmap>
+				<tooltip>Italic</tooltip>
+			</object>
+			<object class="tool" name="ID_UNDERLINE" variable="ToolBarItem8" member="yes">
+				<label>Underline</label>
+				<bitmap>res\underline.png</bitmap>
+				<tooltip>Underline</tooltip>
+			</object>
+			<object class="separator" />
+			<object class="tool" name="ID_TOOLBARITEM4" variable="ToolBarItem9" member="yes">
+				<label>Left align</label>
+				<bitmap>res/Align Left.png</bitmap>
+				<tooltip>Left alignment</tooltip>
+			</object>
+			<object class="tool" name="ID_TOOLBARITEM5" variable="ToolBarItem10" member="yes">
+				<label>Center align</label>
+				<bitmap>res/Align Center.png</bitmap>
+				<tooltip>Center alignment</tooltip>
+			</object>
+			<object class="tool" name="ID_TOOLBARITEM6" variable="ToolBarItem11" member="yes">
+				<label>Right align</label>
+				<bitmap>res\Align Right.png</bitmap>
+				<tooltip>Right alignment</tooltip>
+			</object>
+			<object class="tool" name="ID_TOOLBARITEM3" variable="ToolBarItem12" member="yes">
+				<label>Style sheet</label>
+				<bitmap>res\style.png</bitmap>
+				<tooltip>Style sheet</tooltip>
+			</object>
+		</object>
 	</object>
 </wxsmith>

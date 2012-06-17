@@ -1736,14 +1736,19 @@
 1309417858 i:\wxwidgets2.8\include\wx\univ\theme.h
 	"wx/string.h"
 
-1339817093 i:\icenote\icenotemain.h
+1339940555 i:\icenote\icenotemain.h
 	<wx/treectrl.h>
+	<wx/sizer.h>
+	<wx/stattext.h>
 	<wx/menu.h>
+	<wx/textctrl.h>
 	<wx/splitter.h>
 	<wx/toolbar.h>
+	<wx/panel.h>
 	<wx/richtext/richtextctrl.h>
 	<wx/frame.h>
 	<wx/statusbr.h>
+	"NoteFileHandler.h"
 
 1309417976 i:\wxwidgets2.8\include\wx\menu.h
 	"wx/defs.h"
@@ -1895,11 +1900,15 @@
 
 1309417890 i:\wxwidgets2.8\include\wx\mac\carbon\statusbr.h
 
-1339817550 source:i:\icenote\icenotemain.cpp
+1339941279 source:i:\icenote\icenotemain.cpp
 	"IceNoteMain.h"
 	<wx/msgdlg.h>
+	<wx/bitmap.h>
 	<wx/intl.h>
+	<wx/image.h>
 	<wx/string.h>
+	"NoteTreeItemData.h"
+	<map>
 
 1309417976 i:\wxwidgets2.8\include\wx\msgdlg.h
 	"wx/defs.h"
@@ -8874,4 +8883,81 @@
 1323888240 i:\wxwidgets293\include\wx\generic\splitter.h
 	"wx/window.h"
 	"wx/containr.h"
+
+1323888240 i:\wxwidgets293\include\wx\sizer.h
+	"wx/defs.h"
+	"wx/window.h"
+
+1339941447 source:i:\icenote\notefilehandler.cpp
+	"NoteFileHandler.h"
+	<wx/msgdlg.h>
+
+1339940712 i:\icenote\notefilehandler.h
+	"NoteRelation.h"
+	"NoteItemAbstract.h"
+
+1339940372 i:\icenote\noterelation.h
+
+1339834739 i:\icenote\noteitemabstract.h
+	<wx/string.h>
+	<wx/datetime.h>
+	<wx/richtext/richtextctrl.h>
+
+1339834419 source:i:\icenote\noteitemabstract.cpp
+	"NoteItemAbstract.h"
+
+1339940422 source:i:\icenote\noterelation.cpp
+	"NoteRelation.h"
+
+1339848238 i:\icenote\wximages\icenotemain_toolbarimagelist.xpm
+
+1323888240 i:\wxwidgets293\include\wx\stattext.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/stattext.h"
+	"wx/msw/stattext.h"
+	"wx/motif/stattext.h"
+	"wx/gtk/stattext.h"
+	"wx/gtk1/stattext.h"
+	"wx/osx/stattext.h"
+	"wx/cocoa/stattext.h"
+	"wx/os2/stattext.h"
+	"wx/palmos/stattext.h"
+
+1323888240 i:\wxwidgets293\include\wx\univ\stattext.h
+	"wx/generic/stattextg.h"
+
+1323888240 i:\wxwidgets293\include\wx\generic\stattextg.h
+	"wx/stattext.h"
+
+1323888240 i:\wxwidgets293\include\wx\msw\stattext.h
+
+1323888240 i:\wxwidgets293\include\wx\motif\stattext.h
+
+1323888240 i:\wxwidgets293\include\wx\gtk\stattext.h
+
+1323888240 i:\wxwidgets293\include\wx\gtk1\stattext.h
+
+1323888240 i:\wxwidgets293\include\wx\osx\stattext.h
+
+1323888240 i:\wxwidgets293\include\wx\cocoa\stattext.h
+	"wx/cocoa/NSTextField.h"
+
+1323888240 i:\wxwidgets293\include\wx\os2\stattext.h
+	"wx/control.h"
+
+1323888240 i:\wxwidgets293\include\wx\palmos\stattext.h
+
+1339935859 source:i:\icenote\notetreeitemdata.cpp
+	"NoteTreeItemData.h"
+
+1339934770 i:\icenote\notetreeitemdata.h
+	<wx/treebase.h>
+	"NoteRelation.h"
+
+1339918156 source:i:\icenote\notetreectrl.cpp
+	"NoteTreeCtrl.h"
+
+1339918156 i:\icenote\notetreectrl.h
+	<wx/treectrl.h>
 

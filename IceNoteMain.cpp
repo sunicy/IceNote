@@ -11,11 +11,17 @@
 #include <wx/msgdlg.h>
 
 //(*InternalHeaders(IceNoteFrame)
+#include <wx/bitmap.h>
 #include <wx/intl.h>
+#include <wx/image.h>
 #include <wx/string.h>
+
 //*)
 
+#include "NoteTreeItemData.h"
+#include <map>
 
+using namespace std;
 
 //helper functions
 enum wxbuildinfoformat {
@@ -45,134 +51,194 @@ wxString wxbuildinfo(wxbuildinfoformat format)
 
 //(*IdInit(IceNoteFrame)
 const long IceNoteFrame::ID_TREECTRL = wxNewId();
-const long IceNoteFrame::ID_PANEL1 = wxNewId();
+const long IceNoteFrame::ID_STATICTEXT1 = wxNewId();
+const long IceNoteFrame::ID_TEXTCTRL1 = wxNewId();
+const long IceNoteFrame::ID_STATICTEXT2 = wxNewId();
+const long IceNoteFrame::ID_TEXTCTRL2 = wxNewId();
+const long IceNoteFrame::ID_STATICTEXT3 = wxNewId();
+const long IceNoteFrame::ID_TEXTCTRL3 = wxNewId();
+const long IceNoteFrame::ID_STATICTEXT4 = wxNewId();
+const long IceNoteFrame::ID_TEXTCTRL4 = wxNewId();
+const long IceNoteFrame::ID_PANEL3 = wxNewId();
 const long IceNoteFrame::ID_RICHTEXTCTRL1 = wxNewId();
 const long IceNoteFrame::ID_SPLITTERWINDOW1 = wxNewId();
 const long IceNoteFrame::ID_SPLITTERWINDOW = wxNewId();
-const long IceNoteFrame::idMenuCreateNote = wxNewId();
-const long IceNoteFrame::idMenuCreateNotebook = wxNewId();
-const long IceNoteFrame::idMenuExport = wxNewId();
-const long IceNoteFrame::idMenuImport = wxNewId();
-const long IceNoteFrame::idMenuQuit = wxNewId();
-const long IceNoteFrame::idMenuUndo = wxNewId();
-const long IceNoteFrame::idMenuRedo = wxNewId();
-const long IceNoteFrame::idMenuCut = wxNewId();
-const long IceNoteFrame::idMenuCopy = wxNewId();
-const long IceNoteFrame::idMenuPaste = wxNewId();
-const long IceNoteFrame::idMenuSelectAll = wxNewId();
-const long IceNoteFrame::idMenuWordCount = wxNewId();
-const long IceNoteFrame::idMenuAddPicture = wxNewId();
-const long IceNoteFrame::idMenuImportText = wxNewId();
-const long IceNoteFrame::idMenuStyle = wxNewId();
-const long IceNoteFrame::idMenuAlignLeft = wxNewId();
-const long IceNoteFrame::idMenuAlignCenter = wxNewId();
-const long IceNoteFrame::idMenuAlignRight = wxNewId();
-const long IceNoteFrame::idMenuIncIndent = wxNewId();
-const long IceNoteFrame::idMenuDecIndent = wxNewId();
+const long IceNoteFrame::ID_NEW_NOTEBOOK = wxNewId();
+const long IceNoteFrame::ID_NEW_NOTE = wxNewId();
+const long IceNoteFrame::ID_DEL_NOTE = wxNewId();
+const long IceNoteFrame::ID_EXPORT = wxNewId();
+const long IceNoteFrame::ID_IMPORT = wxNewId();
+const long IceNoteFrame::ID_QUIT = wxNewId();
+const long IceNoteFrame::ID_CUT = wxNewId();
+const long IceNoteFrame::ID_COPY = wxNewId();
+const long IceNoteFrame::ID_PASTE = wxNewId();
+const long IceNoteFrame::ID_SELALL = wxNewId();
+const long IceNoteFrame::ID_WORD_COUNT = wxNewId();
+const long IceNoteFrame::ID_ADD_PIC = wxNewId();
+const long IceNoteFrame::ID_IMPORT_TEXT = wxNewId();
+const long IceNoteFrame::ID_STYLESHEET = wxNewId();
+const long IceNoteFrame::ID_TEXT_ALIGNMENT_LEFT = wxNewId();
+const long IceNoteFrame::ID_TEXT_ALIGNMENT_CENTER = wxNewId();
+const long IceNoteFrame::ID_TEXT_ALIGNMENT_RIGHT = wxNewId();
+const long IceNoteFrame::ID_INC_INDENT = wxNewId();
+const long IceNoteFrame::ID_DEC_INDENT = wxNewId();
 const long IceNoteFrame::ID_MENUITEM1 = wxNewId();
 const long IceNoteFrame::idMenuAbout = wxNewId();
 const long IceNoteFrame::ID_STATUSBAR1 = wxNewId();
+const long IceNoteFrame::ID_BOLD = wxNewId();
+const long IceNoteFrame::ID_ITALIC = wxNewId();
+const long IceNoteFrame::ID_UNDERLINE = wxNewId();
 const long IceNoteFrame::ID_TOOLBAR1 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(IceNoteFrame,wxFrame)
+    EVT_MENU(ID_NEW_NOTEBOOK,  IceNoteFrame::OnCreateNotebook)
+
+    EVT_UPDATE_UI(ID_BOLD,  IceNoteFrame::OnUpdateBold)
+    EVT_UPDATE_UI(ID_ITALIC,  IceNoteFrame::OnUpdateItalic)
+    EVT_UPDATE_UI(ID_UNDERLINE,  IceNoteFrame::OnUpdateUnderline)
+    EVT_MENU(ID_BOLD,  IceNoteFrame::OnBold)
+    EVT_MENU(ID_ITALIC,  IceNoteFrame::OnItalic)
+    EVT_MENU(ID_UNDERLINE,  IceNoteFrame::OnUnderline)
+
+    EVT_MENU(ID_TEXT_ALIGNMENT_LEFT,  IceNoteFrame::OnAlignLeft)
+    EVT_MENU(ID_TEXT_ALIGNMENT_CENTER,  IceNoteFrame::OnAlignCentre)
+    EVT_MENU(ID_TEXT_ALIGNMENT_RIGHT,  IceNoteFrame::OnAlignRight)
+
+    EVT_UPDATE_UI(ID_TEXT_ALIGNMENT_LEFT,  IceNoteFrame::OnUpdateAlignLeft)
+    EVT_UPDATE_UI(ID_TEXT_ALIGNMENT_CENTER,  IceNoteFrame::OnUpdateAlignCentre)
+    EVT_UPDATE_UI(ID_TEXT_ALIGNMENT_RIGHT,  IceNoteFrame::OnUpdateAlignRight)
+
+    EVT_MENU(ID_DEL_NOTE,  IceNoteFrame::OnDelNote)
+
+    EVT_TREE_SEL_CHANGED(ID_TREECTRL, IceNoteFrame::OnSelChanged)
     //(*EventTable(IceNoteFrame)
     //*)
 END_EVENT_TABLE()
 
+#ifndef _CUR_
+    #define RES_DIR "../../res/"
+#else
+    #define RES_DIR "res/"
+#endif
+
+#define PROG_TITLE _T("IceNote")
+
 IceNoteFrame::IceNoteFrame(wxWindow* parent,wxWindowID id)
 {
-    //(*Initialize(IceNoteFrame)
+    /* Let's have the FILE_HANDLER! */
+    m_fileHandler = new NoteFileHandler(wxGetCwd());
+
+    //(*Init[STOP]ialize(IceNoteFrame)
+    wxFlexGridSizer* FlexGridSizer2;
     wxMenu* Menu1;
     wxMenuItem* mnQuit;
-    wxGridSizer* GridSizer1;
     wxMenu* Menu2;
     wxMenuItem* mnAbout;
     wxMenuBar* menuBar;
 
     Create(parent, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
-    SetClientSize(wxSize(935,460));
-    listEditSplitter = new wxSplitterWindow(this, ID_SPLITTERWINDOW, wxPoint(200,224), wxDefaultSize, wxSP_3D|wxFULL_REPAINT_ON_RESIZE, _T("ID_SPLITTERWINDOW"));
+    SetClientSize(wxSize(946,478));
+    listEditSplitter = new wxSplitterWindow(this, ID_SPLITTERWINDOW, wxPoint(200,224), wxDefaultSize, wxSP_LIVE_UPDATE|wxFULL_REPAINT_ON_RESIZE, _T("ID_SPLITTERWINDOW"));
     listEditSplitter->SetMinSize(wxSize(100,100));
     listEditSplitter->SetMinimumPaneSize(100);
-    listEditSplitter->SetSashGravity(0.5);
-    noteTree = new wxTreeCtrl(listEditSplitter, ID_TREECTRL, wxPoint(87,231), wxDefaultSize, wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL"));
-    wxTreeItemId noteTree_Item1 = noteTree->AddRoot(_T("root"));
-    wxTreeItemId noteTree_Item2 = noteTree->AppendItem(noteTree_Item1, _T("item 1"));
-    wxTreeItemId noteTree_Item3 = noteTree->AppendItem(noteTree_Item1, _T("item 2"));
-    wxTreeItemId noteTree_Item4 = noteTree->AppendItem(noteTree_Item1, _T("item 3"));
-    wxTreeItemId noteTree_Item5 = noteTree->AppendItem(noteTree_Item1, _T("item 4"));
-    wxTreeItemId noteTree_Item6 = noteTree->AppendItem(noteTree_Item5, _T("item 7"));
-    wxTreeItemId noteTree_Item7 = noteTree->AppendItem(noteTree_Item6, _T("item 10"));
-    wxTreeItemId noteTree_Item8 = noteTree->AppendItem(noteTree_Item5, _T("item 8"));
-    wxTreeItemId noteTree_Item9 = noteTree->AppendItem(noteTree_Item5, _T("item 9"));
-    wxTreeItemId noteTree_Item10 = noteTree->AppendItem(noteTree_Item1, _T("item 5"));
-    wxTreeItemId noteTree_Item11 = noteTree->AppendItem(noteTree_Item1, _T("item 6"));
-    noteTree->ScrollTo(noteTree_Item2);
-    SplitterWindow1 = new wxSplitterWindow(listEditSplitter, ID_SPLITTERWINDOW1, wxDefaultPosition, wxDefaultSize, wxSP_3D, _T("ID_SPLITTERWINDOW1"));
-    SplitterWindow1->SetMinimumPaneSize(10);
-    SplitterWindow1->SetSashGravity(0.5);
-    Panel1 = new wxPanel(SplitterWindow1, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
-    GridSizer1 = new wxGridSizer(2, 4, 0, 0);
-    Panel1->SetSizer(GridSizer1);
-    GridSizer1->Fit(Panel1);
-    GridSizer1->SetSizeHints(Panel1);
-    RichTextCtrl1 = new wxRichTextCtrl(SplitterWindow1, ID_RICHTEXTCTRL1, _("Text"), wxDefaultPosition, wxDefaultSize, wxRE_MULTILINE, wxDefaultValidator, _T("ID_RICHTEXTCTRL1"));
+    listEditSplitter->SetSashGravity(0);
+    noteTree = new wxTreeCtrl(listEditSplitter, ID_TREECTRL, wxPoint(87,231), wxDefaultSize, wxTR_TWIST_BUTTONS|wxTR_NO_LINES|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL"));
+    wxTreeItemId noteTree_Item1 = noteTree->AddRoot(_T("Notebooks"), -1, -1, new NoteTreeItemData());
+    noteTree->AppendItem(noteTree_Item1, _T("Hello!"), -1, -1, new NoteTreeItemData(10, NIT_DIR));
+
+    SplitterWindow1 = new wxSplitterWindow(listEditSplitter, ID_SPLITTERWINDOW1, wxPoint(890,151), wxDefaultSize, wxNO_BORDER, _T("ID_SPLITTERWINDOW1"));
+    SplitterWindow1->SetMinSize(wxSize(100,100));
+    SplitterWindow1->SetMinimumPaneSize(100);
+    SplitterWindow1->SetSashGravity(0);
+    Panel3 = new wxPanel(SplitterWindow1, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
+    Panel3->SetMinSize(wxSize(-1,150));
+    FlexGridSizer2 = new wxFlexGridSizer(4, 2, 0, 0);
+    FlexGridSizer2->AddGrowableCol(1);
+    StaticText1 = new wxStaticText(Panel3, ID_STATICTEXT1, _("Title"), wxDefaultPosition, wxSize(64,18), wxALIGN_RIGHT, _T("ID_STATICTEXT1"));
+    FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    m_edtTitle = new wxTextCtrl(Panel3, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(560,22), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+    m_edtTitle->SetMinSize(wxSize(-1,22));
+    m_edtTitle->SetMaxSize(wxSize(-1,22));
+    FlexGridSizer2->Add(m_edtTitle, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticText2 = new wxStaticText(Panel3, ID_STATICTEXT2, _("Tags"), wxDefaultPosition, wxSize(64,18), wxALIGN_RIGHT, _T("ID_STATICTEXT2"));
+    FlexGridSizer2->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    m_edtTags = new wxTextCtrl(Panel3, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxSize(560,22), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
+    m_edtTags->SetMinSize(wxSize(-1,22));
+    m_edtTags->SetMaxSize(wxSize(-1,22));
+    FlexGridSizer2->Add(m_edtTags, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticText3 = new wxStaticText(Panel3, ID_STATICTEXT3, _("Created Time"), wxDefaultPosition, wxSize(80,18), wxALIGN_RIGHT, _T("ID_STATICTEXT3"));
+    FlexGridSizer2->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    m_edtCreatedTime = new wxTextCtrl(Panel3, ID_TEXTCTRL3, wxEmptyString, wxDefaultPosition, wxSize(560,22), wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL3"));
+    FlexGridSizer2->Add(m_edtCreatedTime, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticText4 = new wxStaticText(Panel3, ID_STATICTEXT4, _("Last Modified"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+    FlexGridSizer2->Add(StaticText4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    m_edtLastModified = new wxTextCtrl(Panel3, ID_TEXTCTRL4, wxEmptyString, wxDefaultPosition, wxSize(560,22), wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL4"));
+    FlexGridSizer2->Add(m_edtLastModified, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    Panel3->SetSizer(FlexGridSizer2);
+    FlexGridSizer2->Fit(Panel3);
+    FlexGridSizer2->SetSizeHints(Panel3);
+    m_richTextCtrl = new wxRichTextCtrl(SplitterWindow1, ID_RICHTEXTCTRL1, wxEmptyString, wxPoint(252,315), wxDefaultSize, wxWANTS_CHARS|wxVSCROLL|wxHSCROLL, wxDefaultValidator, _T("ID_RICHTEXTCTRL1"));
     	wxRichTextAttr rchtxtAttr_1;
-    SplitterWindow1->SplitHorizontally(Panel1, RichTextCtrl1);
+    SplitterWindow1->SplitHorizontally(Panel3, m_richTextCtrl);
+    SplitterWindow1->SetSashPosition(100);
     listEditSplitter->SplitVertically(noteTree, SplitterWindow1);
     listEditSplitter->SetSashPosition(200);
     menuBar = new wxMenuBar();
     Menu1 = new wxMenu();
-    mnCreateNote = new wxMenuItem(Menu1, idMenuCreateNote, _("Create a note"), wxEmptyString, wxITEM_NORMAL);
-    Menu1->Append(mnCreateNote);
-    mnCreateNotebook = new wxMenuItem(Menu1, idMenuCreateNotebook, _("Create a notebook"), wxEmptyString, wxITEM_NORMAL);
+    mnCreateNotebook = new wxMenuItem(Menu1, ID_NEW_NOTEBOOK, _("Create a notebook"), wxEmptyString, wxITEM_NORMAL);
+    mnCreateNotebook->SetBitmap(wxBitmap(wxImage(_T(RES_DIR"new-notebook.png"))));
     Menu1->Append(mnCreateNotebook);
+    mnCreateNote = new wxMenuItem(Menu1, ID_NEW_NOTE, _("Create a note\tCtrl+N"), wxEmptyString, wxITEM_NORMAL);
+    mnCreateNote->SetBitmap(wxBitmap(wxImage(_T(RES_DIR"new-note.png"))));
+    Menu1->Append(mnCreateNote);
+    MenuItem1 = new wxMenuItem(Menu1, ID_DEL_NOTE, _("Remove Note/Notebook"), wxEmptyString, wxITEM_NORMAL);
+    Menu1->Append(MenuItem1);
     Menu1->AppendSeparator();
-    mnExport = new wxMenuItem(Menu1, idMenuExport, _("Export..."), wxEmptyString, wxITEM_NORMAL);
+    mnExport = new wxMenuItem(Menu1, ID_EXPORT, _("Export..."), wxEmptyString, wxITEM_NORMAL);
     Menu1->Append(mnExport);
-    mnImport = new wxMenuItem(Menu1, idMenuImport, _("Import..."), wxEmptyString, wxITEM_NORMAL);
+    mnImport = new wxMenuItem(Menu1, ID_IMPORT, _("Import..."), wxEmptyString, wxITEM_NORMAL);
     Menu1->Append(mnImport);
-    mnQuit = new wxMenuItem(Menu1, idMenuQuit, _("Quit\tAlt-F4"), _("Quit the application"), wxITEM_NORMAL);
+    mnQuit = new wxMenuItem(Menu1, ID_QUIT, _("Quit\tAlt-F4"), _("Quit the application"), wxITEM_NORMAL);
     Menu1->Append(mnQuit);
     menuBar->Append(Menu1, _("&File"));
     Menu3 = new wxMenu();
-    mnUndo = new wxMenuItem(Menu3, idMenuUndo, _("Undo\tCtrl+Z"), wxEmptyString, wxITEM_NORMAL);
+    mnUndo = new wxMenuItem(Menu3, wxID_UNDO, _("Undo\tCtrl+Z"), wxEmptyString, wxITEM_NORMAL);
     Menu3->Append(mnUndo);
-    mnRedo = new wxMenuItem(Menu3, idMenuRedo, _("Redo\tCtrl+Y"), wxEmptyString, wxITEM_NORMAL);
+    mnRedo = new wxMenuItem(Menu3, wxID_REDO, _("Redo\tCtrl+Y"), wxEmptyString, wxITEM_NORMAL);
     Menu3->Append(mnRedo);
     Menu3->AppendSeparator();
-    mnCut = new wxMenuItem(Menu3, idMenuCut, _("Cut\tCtrl+X"), wxEmptyString, wxITEM_NORMAL);
+    mnCut = new wxMenuItem(Menu3, ID_CUT, _("Cut\tCtrl+X"), wxEmptyString, wxITEM_NORMAL);
     Menu3->Append(mnCut);
-    mnCopy = new wxMenuItem(Menu3, idMenuCopy, _("Copy\tCtrl+C"), wxEmptyString, wxITEM_NORMAL);
+    mnCopy = new wxMenuItem(Menu3, ID_COPY, _("Copy\tCtrl+C"), wxEmptyString, wxITEM_NORMAL);
     Menu3->Append(mnCopy);
-    mnPaste = new wxMenuItem(Menu3, idMenuPaste, _("Paste\tCtrl+V"), wxEmptyString, wxITEM_NORMAL);
+    mnPaste = new wxMenuItem(Menu3, ID_PASTE, _("Paste\tCtrl+V"), wxEmptyString, wxITEM_NORMAL);
     Menu3->Append(mnPaste);
-    mnSelectAll = new wxMenuItem(Menu3, idMenuSelectAll, _("Select &All\tCtrl+A"), wxEmptyString, wxITEM_NORMAL);
+    mnSelectAll = new wxMenuItem(Menu3, ID_SELALL, _("Select &All\tCtrl+A"), wxEmptyString, wxITEM_NORMAL);
     Menu3->Append(mnSelectAll);
     Menu3->AppendSeparator();
-    mnWordCount = new wxMenuItem(Menu3, idMenuWordCount, _("Word Count..."), wxEmptyString, wxITEM_NORMAL);
+    mnWordCount = new wxMenuItem(Menu3, ID_WORD_COUNT, _("Word Count..."), wxEmptyString, wxITEM_NORMAL);
     Menu3->Append(mnWordCount);
     Menu3->AppendSeparator();
-    mnAddPicture = new wxMenuItem(Menu3, idMenuAddPicture, _("Add a picture..."), wxEmptyString, wxITEM_NORMAL);
+    mnAddPicture = new wxMenuItem(Menu3, ID_ADD_PIC, _("Add a picture..."), wxEmptyString, wxITEM_NORMAL);
     Menu3->Append(mnAddPicture);
-    mnImportText = new wxMenuItem(Menu3, idMenuImportText, _("Import text..."), wxEmptyString, wxITEM_NORMAL);
+    mnImportText = new wxMenuItem(Menu3, ID_IMPORT_TEXT, _("Import text..."), wxEmptyString, wxITEM_NORMAL);
     Menu3->Append(mnImportText);
     menuBar->Append(Menu3, _("&Edit"));
     Menu4 = new wxMenu();
-    mnStyle = new wxMenuItem(Menu4, idMenuStyle, _("&Style..."), wxEmptyString, wxITEM_NORMAL);
+    mnStyle = new wxMenuItem(Menu4, ID_STYLESHEET, _("&Style sheet..."), wxEmptyString, wxITEM_NORMAL);
     Menu4->Append(mnStyle);
     MenuItem17 = new wxMenu();
-    mnParaLeft = new wxMenuItem(MenuItem17, idMenuAlignLeft, _("Left"), wxEmptyString, wxITEM_NORMAL);
+    mnParaLeft = new wxMenuItem(MenuItem17, ID_TEXT_ALIGNMENT_LEFT, _("Left"), wxEmptyString, wxITEM_CHECK);
     MenuItem17->Append(mnParaLeft);
-    mnParaCenter = new wxMenuItem(MenuItem17, idMenuAlignCenter, _("Center"), wxEmptyString, wxITEM_NORMAL);
+    mnParaCenter = new wxMenuItem(MenuItem17, ID_TEXT_ALIGNMENT_CENTER, _("Center"), wxEmptyString, wxITEM_CHECK);
     MenuItem17->Append(mnParaCenter);
-    mnParaRight = new wxMenuItem(MenuItem17, idMenuAlignRight, _("Right"), wxEmptyString, wxITEM_NORMAL);
+    mnParaRight = new wxMenuItem(MenuItem17, ID_TEXT_ALIGNMENT_RIGHT, _("Right"), wxEmptyString, wxITEM_CHECK);
     MenuItem17->Append(mnParaRight);
     MenuItem17->AppendSeparator();
-    mnParaIncIndent = new wxMenuItem(MenuItem17, idMenuIncIndent, _("Increse Indent"), wxEmptyString, wxITEM_NORMAL);
+    mnParaIncIndent = new wxMenuItem(MenuItem17, ID_INC_INDENT, _("Increse Indent"), wxEmptyString, wxITEM_NORMAL);
     MenuItem17->Append(mnParaIncIndent);
-    mnParaDecIndent = new wxMenuItem(MenuItem17, idMenuDecIndent, _("Decrease Indent"), wxEmptyString, wxITEM_NORMAL);
+    mnParaDecIndent = new wxMenuItem(MenuItem17, ID_DEC_INDENT, _("Decrease Indent"), wxEmptyString, wxITEM_NORMAL);
     MenuItem17->Append(mnParaDecIndent);
     Menu4->Append(ID_MENUITEM1, _("&Paragraph"), MenuItem17, wxEmptyString);
     menuBar->Append(Menu4, _("&Format"));
@@ -187,11 +253,36 @@ IceNoteFrame::IceNoteFrame(wxWindow* parent,wxWindowID id)
     statusBar->SetFieldsCount(1,__wxStatusBarWidths_1);
     statusBar->SetStatusStyles(1,__wxStatusBarStyles_1);
     SetStatusBar(statusBar);
+    toolBar = new wxToolBar(this, ID_TOOLBAR1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER, _T("ID_TOOLBAR1"));
+    ToolBarItem1 = toolBar->AddTool(ID_NEW_NOTEBOOK, _("Create a notebook"), wxBitmap(wxImage(_T(RES_DIR"new-notebook.png"))), wxNullBitmap, wxITEM_NORMAL, _("Create a notebook"), wxEmptyString);
+    ToolBarItem2 = toolBar->AddTool(ID_NEW_NOTE, _("Create a Note"), wxBitmap(wxImage(_T(RES_DIR"new-note.png"))), wxNullBitmap, wxITEM_NORMAL, _("Create a Note"), wxEmptyString);
+    ToolBarItem3 = toolBar->AddTool(ID_DEL_NOTE, _("Delete a note"), wxBitmap(wxImage(_T(RES_DIR"delete.png"))), wxNullBitmap, wxITEM_NORMAL, _("Delete a note"), wxEmptyString);
+    toolBar->AddSeparator();
+    ToolBarItem4 = toolBar->AddTool(wxID_UNDO, _("Undo"), wxBitmap(wxImage(_T(RES_DIR"undo.png"))), wxNullBitmap, wxITEM_NORMAL, _("Undo the last action"), wxEmptyString);
+    ToolBarItem5 = toolBar->AddTool(wxID_REDO, _("Redo"), wxBitmap(wxImage(_T(RES_DIR"redo.png"))), wxNullBitmap, wxITEM_NORMAL, _("Redo the last action"), wxEmptyString);
+    toolBar->AddSeparator();
+    ToolBarItem6 = toolBar->AddTool(ID_BOLD, _("Bold"), wxBitmap(wxImage(_T(RES_DIR"bold.png"))), wxNullBitmap, wxITEM_CHECK, _("Bold"), wxEmptyString);
+    ToolBarItem7 = toolBar->AddTool(ID_ITALIC, _("Italic"), wxBitmap(wxImage(_T(RES_DIR"italic.png"))), wxNullBitmap, wxITEM_CHECK, _("Italic"), wxEmptyString);
+    ToolBarItem8 = toolBar->AddTool(ID_UNDERLINE, _("Underline"), wxBitmap(wxImage(_T(RES_DIR"underline.png"))), wxNullBitmap, wxITEM_CHECK, _("Underline"), wxEmptyString);
+    toolBar->AddSeparator();
+    ToolBarItem9 = toolBar->AddTool(ID_TEXT_ALIGNMENT_LEFT, _("Left align"), wxBitmap(wxImage(_T(RES_DIR"Align Left.png"))), wxNullBitmap, wxITEM_CHECK, _("Left alignment"), wxEmptyString);
+    ToolBarItem10 = toolBar->AddTool(ID_TEXT_ALIGNMENT_CENTER, _("Center align"), wxBitmap(wxImage(_T(RES_DIR"Align Center.png"))), wxNullBitmap, wxITEM_CHECK, _("Center alignment"), wxEmptyString);
+    ToolBarItem11 = toolBar->AddTool(ID_TEXT_ALIGNMENT_RIGHT, _("Right align"), wxBitmap(wxImage(_T(RES_DIR"Align Right.png"))), wxNullBitmap, wxITEM_CHECK, _("Right alignment"), wxEmptyString);
+    ToolBarItem12 = toolBar->AddTool(ID_STYLESHEET, _("Style sheet"), wxBitmap(wxImage(_T(RES_DIR"style.png"))), wxNullBitmap, wxITEM_NORMAL, _("Style sheet"), wxEmptyString);
+    toolBar->Realize();
+    SetToolBar(toolBar);
 
-    Connect(idMenuCreateNote,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IceNoteFrame::OnMenuItem3Selected);
-    Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IceNoteFrame::OnQuit);
+    Connect(ID_NEW_NOTE,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IceNoteFrame::OnMenuItem3Selected);
+    Connect(ID_QUIT,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IceNoteFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IceNoteFrame::OnAbout);
-    //*)
+    //[STOP]*)
+    m_richTextCtrl->SetFocus();
+    //SplitterWindow1->Enable(false);
+
+    /* Bind the OnSelChanged */
+    Connect(ID_TREECTRL,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&IceNoteFrame::OnSelChanged);
+
+    buildNoteTreeFromFileHandler();
 }
 
 IceNoteFrame::~IceNoteFrame()
@@ -265,4 +356,161 @@ void IceNoteFrame::OnMenuItem3Selected(wxCommandEvent& event)
 
 void IceNoteFrame::OnnoteTreeBeginDrag(wxTreeEvent& event)
 {
+}
+
+void IceNoteFrame::OnnoteTreeBeginDrag1(wxTreeEvent& event)
+{
+}
+
+
+void IceNoteFrame::OnCreateNotebook(wxCommandEvent& event)
+{
+    wxMessageBox(_T("A new notebook!"), _T("Hello"));
+}
+
+void IceNoteFrame::OnUpdateBold(wxUpdateUIEvent& event)
+{
+    event.Check(m_richTextCtrl->IsSelectionBold());
+}
+
+void IceNoteFrame::OnUpdateItalic(wxUpdateUIEvent& event)
+{
+    event.Check(m_richTextCtrl->IsSelectionItalics());
+}
+
+void IceNoteFrame::OnUpdateUnderline(wxUpdateUIEvent& event)
+{
+    event.Check(m_richTextCtrl->IsSelectionUnderlined());
+}
+
+void IceNoteFrame::OnBold(wxCommandEvent& WXUNUSED(event))
+{
+    m_richTextCtrl->ApplyBoldToSelection();
+}
+
+void IceNoteFrame::OnItalic(wxCommandEvent& WXUNUSED(event))
+{
+    m_richTextCtrl->ApplyItalicToSelection();
+}
+
+void IceNoteFrame::OnUnderline(wxCommandEvent& WXUNUSED(event))
+{
+    m_richTextCtrl->ApplyUnderlineToSelection();
+}
+
+void IceNoteFrame::OnAlignLeft(wxCommandEvent& WXUNUSED(event))
+{
+    m_richTextCtrl->ApplyAlignmentToSelection(wxTEXT_ALIGNMENT_LEFT);
+}
+
+void IceNoteFrame::OnAlignCentre(wxCommandEvent& WXUNUSED(event))
+{
+    m_richTextCtrl->ApplyAlignmentToSelection(wxTEXT_ALIGNMENT_CENTRE);
+}
+
+void IceNoteFrame::OnAlignRight(wxCommandEvent& WXUNUSED(event))
+{
+    m_richTextCtrl->ApplyAlignmentToSelection(wxTEXT_ALIGNMENT_RIGHT);
+}
+
+void IceNoteFrame::OnUpdateAlignLeft(wxUpdateUIEvent& event)
+{
+    event.Check(m_richTextCtrl->IsSelectionAligned(wxTEXT_ALIGNMENT_LEFT));
+}
+
+void IceNoteFrame::OnUpdateAlignCentre(wxUpdateUIEvent& event)
+{
+    event.Check(m_richTextCtrl->IsSelectionAligned(wxTEXT_ALIGNMENT_CENTER));
+}
+
+void IceNoteFrame::OnUpdateAlignRight(wxUpdateUIEvent& event)
+{
+    event.Check(m_richTextCtrl->IsSelectionAligned(wxTEXT_ALIGNMENT_RIGHT));
+}
+
+void IceNoteFrame::OnDelNote(wxCommandEvent& WXUNUSED(event))
+{
+    /* if root, oops, sorry sir */
+    if (noteTree->GetRootItem() == noteTree->GetSelection())
+    {
+        wxMessageBox(_T("Sorry, but you cannot remove the notebook set, uninstall IceNote instead please!"), PROG_TITLE);
+        return;
+    }
+    else
+    {
+        wxTreeItemId i = noteTree->GetSelection();
+        NoteTreeItemData *item = (NoteTreeItemData*)(noteTree->GetItemData(i));
+        if (wxMessageBox(wxString::Format(_T("Do you really want to remove %s '%s'?"),
+                                          (item->m_itemType == NIT_DIR) ? _T("Notebook") : _T("Note"),
+                                          m_fileHandler->getItemTitle(item->getItemId())),
+                         PROG_TITLE, wxYES_NO) == wxID_YES)
+        {
+            wxTreeItemId newSelItem = noteTree->GetNextSibling(i);
+            if (!newSelItem.IsOk()) /* if invalid, how about the parent? */
+                newSelItem = noteTree->GetItemParent(i);
+            if ((NoteTreeItemData*)(noteTree->GetItemData(newSelItem))->getItemType == NIT_DIR)
+                m_currentNoteItemId = 0; /* it's root */
+            else
+                m_currentNoteItemId = (NoteTreeItemData*)(noteTree->GetItemData(newSelItem))->getItemId();
+            if (m_fileHandler->deleteItem(item->getItemId())) /* if deleted succ */
+            {
+                /* move to the next */
+                noteTree->SetFocusedItem(newSelItem);
+                /* delete it! */
+                noteTree->Delete(i);
+            }
+        }
+
+    }
+}
+
+void IceNoteFrame::OnSelChanged(wxTreeEvent& event)
+{
+    wxTreeItemId i = event.GetItem();
+    NoteTreeItemData *item = (NoteTreeItemData*)noteTree->GetItemData(i);
+    /* if it is a note, save the past one and load the new one */
+    if (item->getItemType() == NIT_NOTE)
+    {
+        if (m_currentNoteItemId == item->getItemId()) /* if not changed */
+            return;
+        /* STEP1: Save the past one */
+        if (m_currentNoteItemId > 0) /* if the prev is a note */
+        {
+            m_fileHandler->saveNote(m_currentNoteItemId, *m_richTextCtrl);
+        }
+        /* STEP2: Set and load the new one */
+        m_currentNoteItemId = item->getItemId();
+        m_fileHandler->openNote(m_currentNoteItemId, *m_richTextCtrl);
+    }
+}
+
+
+void IceNoteFrame::buildNoteTreeFromFileHandler()
+{
+    map<int, wxTreeItemId> items; /* NoteItemId < -- > wxTreeItemId */
+    /* back to blank! */
+    noteTree->DeleteAllItems();
+    /* add root */
+    noteTree->AddRoot("Notebooks", -1, -1, new NoteTreeItemData());
+    items.insert(map<int, wxTreeItemId>::value_type(0, noteTree->GetRootItem()));
+
+    m_fileHandler->restartRelations();
+    /* read it! */
+    while (!m_fileHandler->isEof())
+    {
+        NoteRelation noteRelation;
+        m_fileHandler->nextRelation(noteRelation); /* of course successful !!*/
+        map<int, wxTreeItemId>::iterator it = items.find(noteRelation.getParentId());
+        if (it != items.end()) /* if we have found the parent */
+        {
+            /* add it into the treeCtrl */
+            wxTreeItemId item = noteTree->AppendItem(it->second, m_fileHandler->getItemTitle(noteRelation.getChildId()), -1, -1,
+                                new NoteTreeItemData(noteRelation.getChildId(), noteRelation.getChildItemType()));
+            if (noteRelation.getChildItemType() == NIT_DIR) /* add it! */
+            {
+                /* add it into the MAP ! */
+                items.insert(map<int, wxTreeItemId>::value_type(noteRelation.getChildId(), item));
+            }
+        }
+    }
 }

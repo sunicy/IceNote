@@ -24,7 +24,7 @@ class NoteRelation
     private:
         int m_parentId;
         int m_childId;
-        NoteItemType childItemType; /* What's the type of the child? */
+        NoteItemType m_childItemType; /* What's the type of the child? */
 };
 
 #endif // NOTERELATION_H

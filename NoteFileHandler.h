@@ -18,6 +18,7 @@ class NoteFileHandler
 {
     public:
         NoteFileHandler();
+        NoteFileHandler(wxString docPath);
         virtual ~NoteFileHandler();
 
     /*
@@ -39,8 +40,11 @@ class NoteFileHandler
         /* fill "itemAbstract" with the abstract, and returns true if succ */
         bool getNoteAbstract(int itemId, NoteItemAbstract& itemAbstract);
 
-        /* get the notebook title, specifying the ItemId; returns -1 if failed */
-        int getNotebookTitle(int itemId);
+        /* get the notebook title, specifying the ItemId; returns "" if failed */
+        wxString getNotebookTitle(int itemId);
+
+        /* get the note/botebook title */
+        wxString getItemTitle(int itemId);
     /*
         PART III: Taking actions */
         /* try to create a note, specifying its parent's ItemId,
@@ -62,6 +66,7 @@ class NoteFileHandler
 
     protected:
     private:
+        int m_relationPos;
 };
 
 #endif // NOTEFILEHANDLER_H
