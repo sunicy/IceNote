@@ -32,6 +32,7 @@ bool NoteFileHandler::nextRelation(NoteRelation& noterelation)
     if(tmp.abseek < 0)
         return false;
     NoteRelation tmp_re(tmp.type,tmp.parentID,tmp.itemID);
+    current_re_id ++;
     noterelation = tmp_re;
     return true;
 }
