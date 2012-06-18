@@ -295,15 +295,14 @@ IceNoteFrame::IceNoteFrame(wxWindow* parent,wxWindowID id)
 
     wxDir dir(wxGetCwd());
     wxArrayString files;
-
-    dir.GetAllFiles(wxGetCwd(), &files);
-
-
-    for (int i = 0; i < files.Count(); i++)
+    wxString t;
+    dir.GetFirst(&t, wxEmptyString, wxDIR_DIRS);
+    do
     {
-        m_richTextCtrl->AppendText(files[i]);
+        m_richTextCtrl->AppendText(t);
         m_richTextCtrl->AppendText(_T("\n"));
-    }
+    } while (dir.GetNext(&t));
+
     SplitterWindow1->Enable(true);
     m_richTextCtrl->SaveFile(_T("c:\\test.xml"));
 }
@@ -327,7 +326,11 @@ void IceNoteFrame::OnAbout(wxCommandEvent& event)
 
 void IceNoteFrame::OnClose(wxCloseEvent& event)
 {
-
+    /* if fun's over, save it! */
+    if (m_currentNoteItemId > 0)
+    {
+        saveAbstract(m_currentNoteItemId);
+    }
 }
 
 void IceNoteFrame::OnRichTextCtrlPaint(wxPaintEvent& event)
