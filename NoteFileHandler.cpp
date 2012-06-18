@@ -74,7 +74,8 @@ void NoteFileHandler::init_tree(listnode& r)
         for(unsigned int i=0;i < files.Count();i ++)
         {
             wxMessageBox(files[i],"caution");
-            if(files[i].IsSameAs("D:\code\soft\note\notes\.config"))
+
+            if(wxFileName(files[i]).GetExt().IsSameAs("config"))
             {
                 wxMessageBox("it's config","caution");
                 continue;
