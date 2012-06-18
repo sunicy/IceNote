@@ -1,4 +1,5 @@
 #include "NoteFileHandler.h"
+#include <wx/filename.h>
 
 #define CONFIG_FILE ".config"
 NoteFileHandler::NoteFileHandler(wxString docDir):abfile(wxString::Format("%s/%s", docDir, CONFIG_FILE))
@@ -12,8 +13,9 @@ NoteFileHandler::NoteFileHandler(wxString docDir):abfile(wxString::Format("%s/%s
 
     init_tree(root);
 
-    if (!abfile.Open())
+    if (!abfile.Exists())
         abfile.Create();
+    abfile.Open();
 }
 
 void NoteFileHandler::restartRelations()

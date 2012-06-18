@@ -8890,8 +8890,9 @@
 	"wx/defs.h"
 	"wx/window.h"
 
-1339984844 source:i:\icenote\notefilehandler.cpp
+1339985856 source:i:\icenote\notefilehandler.cpp
 	"NoteFileHandler.h"
+	<wx/filename.h>
 
 1339983789 i:\icenote\notefilehandler.h
 	"NoteRelation.h"
