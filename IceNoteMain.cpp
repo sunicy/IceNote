@@ -383,7 +383,7 @@ void IceNoteFrame::OnCreateNotebook(wxCommandEvent& event)
     /* where is the parent? */
     wxTreeItemId i = noteTree->GetSelection();
     NoteTreeItemData* parent = (NoteTreeItemData*)noteTree->GetItemData(i);
-    if (parent->getItemType() == NIT_NOTE || 1) /* CURRENTLY ONLY ONE LAYER */
+    if (parent->getItemType() == NIT_NOTE) /* CURRENTLY ONLY ONE LAYER */
     {
         i = noteTree->GetItemParent(i);
         parent = (NoteTreeItemData*)noteTree->GetItemData(i);
