@@ -13,6 +13,8 @@
 #include "IceNoteMain.h"
 #include <wx/image.h>
 //*)
+#include <wx/richtext/richtextbuffer.h>
+#include <wx/richtext/richtextxml.h>
 
 IMPLEMENT_APP(IceNoteApp);
 
@@ -21,6 +23,7 @@ bool IceNoteApp::OnInit()
     //(*AppInitialize
     bool wxsOK = true;
     wxInitAllImageHandlers();
+    wxRichTextBuffer::AddHandler(new wxRichTextXMLHandler);
     if ( wxsOK )
     {
     	IceNoteFrame* Frame = new IceNoteFrame(0);
@@ -28,6 +31,7 @@ bool IceNoteApp::OnInit()
     	SetTopWindow(Frame);
     }
     //*)
+
     return wxsOK;
 
 }
