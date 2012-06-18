@@ -11,6 +11,8 @@
 #include <wx/textfile.h>
 #include <wx/filefn.h>
 #include <wx/msgdlg.h>
+#include <wx/datetime.h>
+
 using std::vector;
 
 /* This is the core class concerning all file-handling of
@@ -37,7 +39,11 @@ class listnode
     }
     listnode(const listnode& node)
     {
-
+        this->itemID = node.itemID;
+        this->parentID = node.parentID;
+        this->abseek = node.abseek;
+        this->path = node.path;
+        this->type = node.type;
     }
 
         int itemID;
@@ -102,6 +108,7 @@ class NoteFileHandler
 
         /**/
         void init_tree(listnode& t);
+        void get_all_item(wxString& path,wxArrayString& files);
         int get_abstract(listnode& r,NoteItemAbstract& itemabs);
         int get_title(listnode& r,wxString& abstr);
         void remove_dir(int itemid);
