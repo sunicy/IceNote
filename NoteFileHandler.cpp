@@ -9,7 +9,8 @@ NoteFileHandler::NoteFileHandler(wxString docDir):abfile(wxString::Format("%s/%s
     abseek = 0;
     current_re_id = 0;
     //wxSetWorkingDirectory("##");
-    listnode root(id,id,abseek,docDir,NIT_DIR);
+    current_path = docDir;
+    listnode root(id,id,abseek,current_path,NIT_DIR);
 
     init_tree(root);
 
@@ -60,14 +61,23 @@ void NoteFileHandler::init_tree(listnode& r)
     if(r.type == NIT_DIR)
     {
         wxDir tmpdir(r.path);
+        wxMessageBox(r.path,"caution");
         wxArrayString files;
         /*
         Notetraverser travers(files);
         tmpdir.Traverse(travers);
         */
         tmpdir.GetAllFiles(r.path,&files,wxEmptyString);
+        wxMessageBox(wxString::Format("%d",files.Count()),"caution");
+        //wxMessageBox(files[0],"caution");
         for(unsigned int i=0;i < files.Count();i ++)
         {
+            wxMessageBox(files[i],"caution");
+            if(files[i].IsSameAs("D:\code\soft\note\notes\.config"))
+            {
+                wxMessageBox("it's config","caution");
+                continue;
+            }
             if(wxFile::Exists(files[i]))
             {
                 listnode tmpnode(id,r.itemID,abseek,files[i],NIT_NOTE);
@@ -151,6 +161,8 @@ int NoteFileHandler::createNote(int parentId)
 /*????????*/
 bool NoteFileHandler::isEof()
 {
+    if(current_re_id < id)
+        return false;
     return true;
 }
 
@@ -174,8 +186,9 @@ wxString NoteFileHandler::getNotebookTitle(int itemId)
 int NoteFileHandler::createNotebook(wxString notebookTitle, int parentId)
 {
     listnode parent = tree[parentId];
-    wxString t = parent.path+wxString::Format("%d",id);
+    wxString t = wxString::Format("%s/%d",parent.path,id);
     wxDir dir;
+    wxMessageBox(t,parent.path);
     dir.Make(t);
 
     listnode tmp(id,parentId,abseek,t,NIT_DIR);

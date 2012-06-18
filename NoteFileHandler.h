@@ -10,6 +10,7 @@
 #include <wx/file.h>
 #include <wx/textfile.h>
 #include <wx/filefn.h>
+#include <wx/msgdlg.h>
 using std::vector;
 
 /* This is the core class concerning all file-handling of
@@ -116,6 +117,7 @@ class NoteFileHandler
         int abseek;       /*global var for the seek in abfile*/
         int current_re_id;  /*the id of the relation we get*/
         int id;     /*auto increase*/
+        wxString current_path;/* our work path*/
 };
 
 #endif // NOTEFILEHANDLER_H
