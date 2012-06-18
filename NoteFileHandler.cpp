@@ -154,7 +154,7 @@ wxString NoteFileHandler::getNotebookTitle(int itemId)
     return "";
 }
 
-int NoteFileHandler::createNotebook(wxString notebookTitle)
+int NoteFileHandler::createNotebook(wxString notebookTitle, int parentId)
 {
     return 0;
 }

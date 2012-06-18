@@ -121,6 +121,7 @@
 		<Unit filename="NoteRelation.h" />
 		<Unit filename="NoteTreeItemData.cpp" />
 		<Unit filename="NoteTreeItemData.h" />
+		<Unit filename="Notetraverser.cpp" />
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>

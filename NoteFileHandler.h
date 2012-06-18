@@ -88,7 +88,7 @@ class NoteFileHandler
 
         /* try to create a notebook, and returns the new ItemId if succ,
             -1 if failed */
-        int createNotebook(wxString notebookTitle);
+        int createNotebook(wxString notebookTitle, int parentId);
 
         /* removing
             1.the notebook together with all the notes in it;

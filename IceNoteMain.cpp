@@ -388,7 +388,7 @@ void IceNoteFrame::OnCreateNotebook(wxCommandEvent& event)
         i = noteTree->GetItemParent(i);
         parent = (NoteTreeItemData*)noteTree->GetItemData(i);
     }
-    int itemId = m_fileHandler->createNotebook(name);
+    int itemId = m_fileHandler->createNotebook(name, i);
     if (itemId > 0)
     {
         i = noteTree->AppendItem(i, name, 0, 0, new NoteTreeItemData(itemId, NIT_DIR));
