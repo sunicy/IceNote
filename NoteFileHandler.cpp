@@ -35,13 +35,22 @@ bool NoteFileHandler::nextRelation(NoteRelation& noterelation)
     return true;
 }
 
+/*
 void NoteFileHandler::get_path(wxString path,wxArrayString& files)
 {
     wxDir dir(path);
     wxArrayString tmparray;
     dir.GetAllFiles(path,&tmparray,wxDIR_FILES);
-    for(int i)
+    for(int i=0;i < tmparray.size();i ++)
+    {
+        files.Add(tmparray[i]);
+    }
+
+    wxString r;
+    dir.GetFirst(&r,&tmparray,wxDIR_DIRS);
+
 }
+*/
 
 void NoteFileHandler::init_tree(listnode& r)
 {
@@ -61,7 +70,7 @@ void NoteFileHandler::init_tree(listnode& r)
         {
             if(wxFile::Exists(files[i]))
             {
-                listnode tmpnode(id,r.itemID,abseek,tmpdir.GetName()+files[i],NIT_NOTE);
+                listnode tmpnode(id,r.itemID,abseek,files[i],NIT_NOTE);
                 tree.insert(tree.end(),tmpnode);
                 id ++;
                 abseek += 4;
@@ -164,8 +173,15 @@ wxString NoteFileHandler::getNotebookTitle(int itemId)
 
 int NoteFileHandler::createNotebook(wxString notebookTitle, int parentId)
 {
-    listnode tmp(id,parentId,abseek,path);
-    return 0;
+    listnode parent = tree[parentId];
+    wxString t = parent.path+wxString::Format("%d",id);
+    wxDir dir;
+    dir.Make(t);
+
+    listnode tmp(id,parentId,abseek,t,NIT_DIR);
+    abseek ++;
+    id ++;
+    return tmp.itemID;
 }
 
 bool NoteFileHandler::deleteItem(int itemId)
@@ -177,11 +193,17 @@ bool NoteFileHandler::deleteItem(int itemId)
 
 bool NoteFileHandler::saveNote(int itemId, wxRichTextCtrl& textCtrl)
 {
+
     return true;
 }
 
 bool NoteFileHandler::openNote(int itemId, wxRichTextCtrl& textCtrl)
 {
+    listnode tmp = tree[itemId];
+    if(tmp.abseek < 0)
+    {
+        return false;
+    }
     return true;
 }
 
