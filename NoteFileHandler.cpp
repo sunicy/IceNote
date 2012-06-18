@@ -2,7 +2,7 @@
 
 #include <wx/msgdlg.h>
 
-NoteFileHandler::NoteFileHandler(wxString docPath) : m_relationPos(0)
+NoteFileHandler::NoteFileHandler(wxString docPath) : m_relationPos(0), m_relationCount(18)
 {
     //ctor
 }
@@ -41,8 +41,15 @@ bool NoteFileHandler::isEof()
 
 bool NoteFileHandler::getNoteAbstract(int itemId, NoteItemAbstract& itemAbstract)
 {
+    itemAbstract = NoteItemAbstract(getItemTitle(itemId), _T("Hello"), wxDateTime::Now(), wxDateTime::Now());
     return true;
 }
+
+bool NoteFileHandler::setNoteAbstract(int itemId, const NoteItemAbstract& itemAbstract)
+{
+    return true;
+}
+
 
 wxString NoteFileHandler::getNotebookTitle(int itemId)
 {
@@ -67,22 +74,25 @@ wxString NoteFileHandler::getItemTitle(int itemId)
 
 int NoteFileHandler::createNote(int parentId)
 {
+    return ++m_relationCount;
 }
 
 int NoteFileHandler::createNotebook(wxString notebookTitle)
 {
+    return ++m_relationCount;
 }
 
 bool NoteFileHandler::deleteItem(int itemId)
 {
+    return true;
 }
 
 bool NoteFileHandler::saveNote(int itemId, wxRichTextCtrl& textCtrl)
 {
-    wxMessageBox(wxString::Format(_T("%d saved"), itemId), _T(""));
+    //wxMessageBox(wxString::Format(_T("%d saved"), itemId), _T(""));
 }
 
 bool NoteFileHandler::openNote(int itemId, wxRichTextCtrl& textCtrl)
 {
-    wxMessageBox(wxString::Format(_T("%d opened"), itemId), _T(""));
+    //wxMessageBox(wxString::Format(_T("%d opened"), itemId), _T(""));
 }

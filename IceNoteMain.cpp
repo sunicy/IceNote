@@ -20,6 +20,8 @@
 
 #include "NoteTreeItemData.h"
 #include <map>
+#include <wx/textdlg.h>
+#include <wx/richtext/richtextformatdlg.h>
 
 using namespace std;
 
@@ -93,6 +95,7 @@ const long IceNoteFrame::ID_TOOLBAR1 = wxNewId();
 
 BEGIN_EVENT_TABLE(IceNoteFrame,wxFrame)
     EVT_MENU(ID_NEW_NOTEBOOK,  IceNoteFrame::OnCreateNotebook)
+    EVT_MENU(ID_NEW_NOTE,  IceNoteFrame::OnCreateNote)
 
     EVT_UPDATE_UI(ID_BOLD,  IceNoteFrame::OnUpdateBold)
     EVT_UPDATE_UI(ID_ITALIC,  IceNoteFrame::OnUpdateItalic)
@@ -110,6 +113,7 @@ BEGIN_EVENT_TABLE(IceNoteFrame,wxFrame)
     EVT_UPDATE_UI(ID_TEXT_ALIGNMENT_RIGHT,  IceNoteFrame::OnUpdateAlignRight)
 
     EVT_MENU(ID_DEL_NOTE,  IceNoteFrame::OnDelNote)
+    EVT_MENU(ID_STYLESHEET,  IceNoteFrame::OnStyleSheet)
 
     EVT_TREE_SEL_CHANGED(ID_TREECTRL, IceNoteFrame::OnSelChanged)
     //(*EventTable(IceNoteFrame)
@@ -137,6 +141,10 @@ IceNoteFrame::IceNoteFrame(wxWindow* parent,wxWindowID id)
     wxMenuItem* mnAbout;
     wxMenuBar* menuBar;
 
+    wxImageList* noteImageList = new wxImageList(16, 16, 3);
+    noteImageList->Add(wxBitmap(Notebook_XPM));
+    noteImageList->Add(wxBitmap(Note_XPM));
+
     Create(parent, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(946,478));
     listEditSplitter = new wxSplitterWindow(this, ID_SPLITTERWINDOW, wxPoint(200,224), wxDefaultSize, wxSP_LIVE_UPDATE|wxFULL_REPAINT_ON_RESIZE, _T("ID_SPLITTERWINDOW"));
@@ -144,6 +152,7 @@ IceNoteFrame::IceNoteFrame(wxWindow* parent,wxWindowID id)
     listEditSplitter->SetMinimumPaneSize(100);
     listEditSplitter->SetSashGravity(0);
     noteTree = new wxTreeCtrl(listEditSplitter, ID_TREECTRL, wxPoint(87,231), wxDefaultSize, wxTR_TWIST_BUTTONS|wxTR_NO_LINES|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL"));
+    noteTree->SetImageList(noteImageList);
     wxTreeItemId noteTree_Item1 = noteTree->AddRoot(_T("Notebooks"), -1, -1, new NoteTreeItemData());
     noteTree->AppendItem(noteTree_Item1, _T("Hello!"), -1, -1, new NoteTreeItemData(10, NIT_DIR));
 
@@ -272,7 +281,6 @@ IceNoteFrame::IceNoteFrame(wxWindow* parent,wxWindowID id)
     toolBar->Realize();
     SetToolBar(toolBar);
 
-    Connect(ID_NEW_NOTE,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IceNoteFrame::OnMenuItem3Selected);
     Connect(ID_QUIT,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IceNoteFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IceNoteFrame::OnAbout);
     //[STOP]*)
@@ -365,7 +373,60 @@ void IceNoteFrame::OnnoteTreeBeginDrag1(wxTreeEvent& event)
 
 void IceNoteFrame::OnCreateNotebook(wxCommandEvent& event)
 {
-    wxMessageBox(_T("A new notebook!"), _T("Hello"));
+    if (!noteTree->GetSelection().IsOk())
+        noteTree->SelectItem(noteTree->GetRootItem());
+    wxString name = wxGetTextFromUser(_T("Please enter the name of the notebook:"), PROG_TITLE);
+    if (name.IsEmpty())
+        return ; /* nothing to record */
+
+    /* where is the parent? */
+    wxTreeItemId i = noteTree->GetSelection();
+    NoteTreeItemData* parent = (NoteTreeItemData*)noteTree->GetItemData(i);
+    if (parent->getItemType() == NIT_NOTE || 1) /* CURRENTLY ONLY ONE LAYER */
+    {
+        i = noteTree->GetItemParent(i);
+        parent = (NoteTreeItemData*)noteTree->GetItemData(i);
+    }
+    int itemId = m_fileHandler->createNotebook(name);
+    if (itemId > 0)
+    {
+        i = noteTree->AppendItem(i, name, 0, 0, new NoteTreeItemData(itemId, NIT_DIR));
+        noteTree->SelectItem(i);
+        noteTree->SetFocus();
+    }
+    else
+        wxMessageBox(_T("Error occured while creating a notebook."), PROG_TITLE);
+}
+
+void IceNoteFrame::OnCreateNote(wxCommandEvent& event)
+{
+    if (!noteTree->GetSelection().IsOk())
+        return; /* nothing chosen! */
+    /* where is the parent? */
+    wxTreeItemId i = noteTree->GetSelection();
+    if (i == noteTree->GetRootItem())
+    {
+        wxMessageBox(_T("Would you please choose a notebook first?"), PROG_TITLE);
+        return;
+    }
+    NoteTreeItemData* parent = (NoteTreeItemData*)noteTree->GetItemData(i);
+    if (parent->getItemType() == NIT_NOTE)
+    {
+        i = noteTree->GetItemParent(i);
+        parent = (NoteTreeItemData*)noteTree->GetItemData(i);
+    }
+    int itemId = m_fileHandler->createNote(parent->getItemId());
+    if (itemId > 0)
+    {
+        i = noteTree->AppendItem(i, _T("Unnamed note"), 1, 1, new NoteTreeItemData(itemId, NIT_NOTE));
+        /* init abstarct and save it! */
+        m_currentAbstract = NoteItemAbstract(wxEmptyString, wxEmptyString, wxDateTime::Now(), wxDateTime::Now());
+        saveAbstract(itemId);
+        noteTree->SelectItem(i);
+        noteTree->SetFocus();
+    }
+    else
+        wxMessageBox(_T("Error occured while creating a new note."), PROG_TITLE);
 }
 
 void IceNoteFrame::OnUpdateBold(wxUpdateUIEvent& event)
@@ -430,6 +491,8 @@ void IceNoteFrame::OnUpdateAlignRight(wxUpdateUIEvent& event)
 
 void IceNoteFrame::OnDelNote(wxCommandEvent& WXUNUSED(event))
 {
+    if (!noteTree->GetSelection().IsOk())
+        return; /* nothing chosen! */
     /* if root, oops, sorry sir */
     if (noteTree->GetRootItem() == noteTree->GetSelection())
     {
@@ -441,26 +504,44 @@ void IceNoteFrame::OnDelNote(wxCommandEvent& WXUNUSED(event))
         wxTreeItemId i = noteTree->GetSelection();
         NoteTreeItemData *item = (NoteTreeItemData*)(noteTree->GetItemData(i));
         if (wxMessageBox(wxString::Format(_T("Do you really want to remove %s '%s'?"),
-                                          (item->m_itemType == NIT_DIR) ? _T("Notebook") : _T("Note"),
+                                          (item->getItemType() == NIT_DIR) ? _T("Notebook") : _T("Note"),
                                           m_fileHandler->getItemTitle(item->getItemId())),
-                         PROG_TITLE, wxYES_NO) == wxID_YES)
+                         PROG_TITLE, wxYES_NO) == wxYES)
         {
             wxTreeItemId newSelItem = noteTree->GetNextSibling(i);
             if (!newSelItem.IsOk()) /* if invalid, how about the parent? */
                 newSelItem = noteTree->GetItemParent(i);
-            if ((NoteTreeItemData*)(noteTree->GetItemData(newSelItem))->getItemType == NIT_DIR)
-                m_currentNoteItemId = 0; /* it's root */
-            else
-                m_currentNoteItemId = (NoteTreeItemData*)(noteTree->GetItemData(newSelItem))->getItemId();
+            //if (((NoteTreeItemData*)(noteTree->GetItemData(newSelItem)))->getItemType() == NIT_DIR)
+            m_currentNoteItemId = 0; /* suppose it's root */
             if (m_fileHandler->deleteItem(item->getItemId())) /* if deleted succ */
             {
-                /* move to the next */
-                noteTree->SetFocusedItem(newSelItem);
                 /* delete it! */
                 noteTree->Delete(i);
+                /* move to the next */
+                noteTree->SelectItem(newSelItem);
+                noteTree->SetFocus();
             }
         }
 
+    }
+}
+
+void IceNoteFrame::OnStyleSheet(wxCommandEvent& WXUNUSED(event))
+{
+    wxRichTextRange range;
+    if (m_richTextCtrl->HasSelection())
+        range = m_richTextCtrl->GetSelectionRange();
+    else
+        range = wxRichTextRange(0, m_richTextCtrl->GetLastPosition()+1);
+
+    int pages = wxRICHTEXT_FORMAT_FONT;
+
+    wxRichTextFormattingDialog formatDlg(pages, this);
+    formatDlg.GetStyle(m_richTextCtrl, range);
+
+    if (formatDlg.ShowModal() == wxID_OK)
+    {
+        formatDlg.ApplyStyle(m_richTextCtrl, range, wxRICHTEXT_SETSTYLE_WITH_UNDO|wxRICHTEXT_SETSTYLE_OPTIMIZE|wxRICHTEXT_SETSTYLE_CHARACTERS_ONLY);
     }
 }
 
@@ -476,12 +557,52 @@ void IceNoteFrame::OnSelChanged(wxTreeEvent& event)
         /* STEP1: Save the past one */
         if (m_currentNoteItemId > 0) /* if the prev is a note */
         {
+            saveAbstract(m_currentNoteItemId);
             m_fileHandler->saveNote(m_currentNoteItemId, *m_richTextCtrl);
         }
         /* STEP2: Set and load the new one */
         m_currentNoteItemId = item->getItemId();
         m_fileHandler->openNote(m_currentNoteItemId, *m_richTextCtrl);
+        loadAndShowAbstract(m_currentNoteItemId);
     }
+
+    SplitterWindow1->Enable(m_currentNoteItemId != 0);
+    if (m_currentNoteItemId == 0)
+        loadAndShowAbstract(0);
+}
+
+void IceNoteFrame::loadAndShowAbstract(int itemId)
+{
+    if (itemId > 0)
+    {
+        m_fileHandler->getNoteAbstract(itemId, m_currentAbstract);
+        m_edtTitle->SetValue(m_currentAbstract.getTitle());
+        m_edtTags->SetValue(m_currentAbstract.getTags());
+        m_edtCreatedTime->SetValue(m_currentAbstract.getCreatedTime().Format());
+        m_edtLastModified->SetValue(m_currentAbstract.getLastModified().Format());
+    }
+    else
+    {
+        m_edtTitle->SetValue("");
+        m_edtTags->SetValue("");
+        m_edtCreatedTime->SetValue("");
+        m_edtLastModified->SetValue("");
+    }
+}
+
+void IceNoteFrame::saveAbstract(int itemId)
+{
+    if (m_edtTitle->GetValue().IsEmpty())
+        m_edtTitle->SetValue(_T("Unnamed Note"));
+
+    wxDateTime lastModifiedTime = wxDateTime::Now();
+    m_edtLastModified->SetValue(lastModifiedTime.Format());
+    NoteItemAbstract abstract(m_edtTitle->GetValue(),
+                              m_edtTags->GetValue(),
+                              m_currentAbstract.getCreatedTime(),
+                              lastModifiedTime);
+    m_currentAbstract = abstract;
+    m_fileHandler->setNoteAbstract(itemId, m_currentAbstract);
 }
 
 
@@ -503,8 +624,9 @@ void IceNoteFrame::buildNoteTreeFromFileHandler()
         map<int, wxTreeItemId>::iterator it = items.find(noteRelation.getParentId());
         if (it != items.end()) /* if we have found the parent */
         {
+            int imageIndex = (noteRelation.getChildItemType() == NIT_DIR) ? 0 : 1;
             /* add it into the treeCtrl */
-            wxTreeItemId item = noteTree->AppendItem(it->second, m_fileHandler->getItemTitle(noteRelation.getChildId()), -1, -1,
+            wxTreeItemId item = noteTree->AppendItem(it->second, m_fileHandler->getItemTitle(noteRelation.getChildId()), imageIndex, imageIndex,
                                 new NoteTreeItemData(noteRelation.getChildId(), noteRelation.getChildItemType()));
             if (noteRelation.getChildItemType() == NIT_DIR) /* add it! */
             {

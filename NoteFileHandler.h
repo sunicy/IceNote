@@ -40,6 +40,8 @@ class NoteFileHandler
         /* fill "itemAbstract" with the abstract, and returns true if succ */
         bool getNoteAbstract(int itemId, NoteItemAbstract& itemAbstract);
 
+        bool setNoteAbstract(int itemId, const NoteItemAbstract& itemAbstract);
+
         /* get the notebook title, specifying the ItemId; returns "" if failed */
         wxString getNotebookTitle(int itemId);
 
@@ -67,6 +69,7 @@ class NoteFileHandler
     protected:
     private:
         int m_relationPos;
+        int m_relationCount;
 };
 
 #endif // NOTEFILEHANDLER_H

@@ -119,6 +119,8 @@
 		<Unit filename="NoteItemAbstract.h" />
 		<Unit filename="NoteRelation.cpp" />
 		<Unit filename="NoteRelation.h" />
+		<Unit filename="NoteTreeItemData.cpp" />
+		<Unit filename="NoteTreeItemData.h" />
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>

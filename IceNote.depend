@@ -1736,7 +1736,7 @@
 1309417858 i:\wxwidgets2.8\include\wx\univ\theme.h
 	"wx/string.h"
 
-1339940555 i:\icenote\icenotemain.h
+1339957811 i:\icenote\icenotemain.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -1900,7 +1900,7 @@
 
 1309417890 i:\wxwidgets2.8\include\wx\mac\carbon\statusbr.h
 
-1339941279 source:i:\icenote\icenotemain.cpp
+1339956036 source:i:\icenote\icenotemain.cpp
 	"IceNoteMain.h"
 	<wx/msgdlg.h>
 	<wx/bitmap.h>
@@ -1909,6 +1909,7 @@
 	<wx/string.h>
 	"NoteTreeItemData.h"
 	<map>
+	<wx/textdlg.h>
 
 1309417976 i:\wxwidgets2.8\include\wx\msgdlg.h
 	"wx/defs.h"
@@ -8888,11 +8889,11 @@
 	"wx/defs.h"
 	"wx/window.h"
 
-1339941447 source:i:\icenote\notefilehandler.cpp
+1339955210 source:i:\icenote\notefilehandler.cpp
 	"NoteFileHandler.h"
 	<wx/msgdlg.h>
 
-1339940712 i:\icenote\notefilehandler.h
+1339955144 i:\icenote\notefilehandler.h
 	"NoteRelation.h"
 	"NoteItemAbstract.h"
 
@@ -8903,7 +8904,7 @@
 	<wx/datetime.h>
 	<wx/richtext/richtextctrl.h>
 
-1339834419 source:i:\icenote\noteitemabstract.cpp
+1339952058 source:i:\icenote\noteitemabstract.cpp
 	"NoteItemAbstract.h"
 
 1339940422 source:i:\icenote\noterelation.cpp
@@ -8960,4 +8961,17 @@
 
 1339918156 i:\icenote\notetreectrl.h
 	<wx/treectrl.h>
+
+1323888240 i:\wxwidgets293\include\wx\textdlg.h
+	"wx/generic/textdlgg.h"
+
+1323888240 i:\wxwidgets293\include\wx\generic\textdlgg.h
+	"wx/defs.h"
+	"wx/dialog.h"
+	"wx/valtext.h"
+	"wx/textctrl.h"
+
+1323888240 i:\wxwidgets293\include\wx\valtext.h
+	"wx/defs.h"
+	"wx/validate.h"
 
