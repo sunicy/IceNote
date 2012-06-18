@@ -74,10 +74,10 @@ void NoteFileHandler::init_tree(listnode& r)
         for(unsigned int i=0;i < files.Count();i ++)
         {
             wxMessageBox(files[i],"caution");
-
-            if(wxFileName(files[i]).GetExt().IsSameAs("config"))
+//wxMessageBox(wxFileName(files[i]).GetFullName(),"hello");
+            if(wxFileName(files[i]).GetFullName().IsSameAs(".config"))
             {
-                wxMessageBox("it's config","caution");
+                //wxMessageBox(files[i],"config caution");
                 continue;
             }
             if(wxFile::Exists(files[i]))
@@ -163,8 +163,12 @@ int NoteFileHandler::createNote(int parentId)
 /*????????*/
 bool NoteFileHandler::isEof()
 {
-    if(current_re_id < id)
+    if(current_re_id < id-1)
+    {
+        wxMessageBox(wxString::Format("%d",current_re_id),"reId");
         return false;
+    }
+
     return true;
 }
 
