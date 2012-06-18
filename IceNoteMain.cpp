@@ -120,18 +120,19 @@ BEGIN_EVENT_TABLE(IceNoteFrame,wxFrame)
     //*)
 END_EVENT_TABLE()
 
-#ifndef _CUR_
-    #define RES_DIR "../../res/"
-#else
-    #define RES_DIR "res/"
-#endif
-
 #define PROG_TITLE _T("IceNote")
+#define RES_DIR "res/"
+#define NB_DIR  _T("/notes")
 
 IceNoteFrame::IceNoteFrame(wxWindow* parent,wxWindowID id)
 {
+
+    #ifndef _CUR_
+        wxFileName::SetCwd("../../");
+    #endif
     /* Let's have the FILE_HANDLER! */
-    m_fileHandler = new NoteFileHandler(wxGetCwd());
+    wxString noteDir = wxGetCwd() << NB_DIR;
+    m_fileHandler = new NoteFileHandler(noteDir);
 
     //(*Init[STOP]ialize(IceNoteFrame)
     wxFlexGridSizer* FlexGridSizer2;

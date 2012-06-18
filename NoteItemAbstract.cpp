@@ -18,23 +18,43 @@ NoteItemAbstract::NoteItemAbstract(wxString title, wxString tags, wxDateTime cre
     m_lastModified = lastModified;
 }
 
-wxString NoteItemAbstract::getTitle()
+wxString NoteItemAbstract::getTitle()const
 {
     return m_title;
 }
 
-wxString NoteItemAbstract::getTags()
+wxString NoteItemAbstract::getTags()const
 {
     return m_tags;
 }
 
-wxDateTime NoteItemAbstract::getCreatedTime()
+wxDateTime NoteItemAbstract::getCreatedTime()const
 {
     return m_createdTime;
 }
 
-wxDateTime NoteItemAbstract::getLastModified()
+wxDateTime NoteItemAbstract::getLastModified()const
 {
     return m_lastModified;
+}
+
+void NoteItemAbstract::setTitile(wxString title)
+{
+    m_title = title;
+}
+
+void NoteItemAbstract::setTags(wxString tags)
+{
+    m_tags = tags;
+}
+
+void NoteItemAbstract::setCreateTime(wxDateTime time)
+{
+    m_createdTime = time;
+}
+
+void NoteItemAbstract::setLastModified(wxDateTime time)
+{
+    m_lastModified = time;
 }
 
