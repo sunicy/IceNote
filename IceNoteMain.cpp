@@ -292,6 +292,20 @@ IceNoteFrame::IceNoteFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_TREECTRL,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&IceNoteFrame::OnSelChanged);
 
     buildNoteTreeFromFileHandler();
+
+    wxDir dir(wxGetCwd());
+    wxArrayString files;
+
+    dir.GetAllFiles(wxGetCwd(), &files);
+
+
+    for (int i = 0; i < files.Count(); i++)
+    {
+        m_richTextCtrl->AppendText(files[i]);
+        m_richTextCtrl->AppendText(_T("\n"));
+    }
+    SplitterWindow1->Enable(true);
+    m_richTextCtrl->SaveFile(_T("c:\\test.xml"));
 }
 
 IceNoteFrame::~IceNoteFrame()
@@ -388,7 +402,7 @@ void IceNoteFrame::OnCreateNotebook(wxCommandEvent& event)
         i = noteTree->GetItemParent(i);
         parent = (NoteTreeItemData*)noteTree->GetItemData(i);
     }
-    int itemId = m_fileHandler->createNotebook(name, i);
+    int itemId = m_fileHandler->createNotebook(name, parent->getItemId());
     if (itemId > 0)
     {
         i = noteTree->AppendItem(i, name, 0, 0, new NoteTreeItemData(itemId, NIT_DIR));
