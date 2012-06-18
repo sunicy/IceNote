@@ -35,6 +35,14 @@ bool NoteFileHandler::nextRelation(NoteRelation& noterelation)
     return true;
 }
 
+void NoteFileHandler::get_path(wxString path,wxArrayString& files)
+{
+    wxDir dir(path);
+    wxArrayString tmparray;
+    dir.GetAllFiles(path,&tmparray,wxDIR_FILES);
+    for(int i)
+}
+
 void NoteFileHandler::init_tree(listnode& r)
 {
     tree.insert(tree.end(),r);
@@ -48,7 +56,7 @@ void NoteFileHandler::init_tree(listnode& r)
         Notetraverser travers(files);
         tmpdir.Traverse(travers);
         */
-        tmpdir.GetAllFiles(r.path,&files,wxEmptyString,wxDIR_FILES|wxDIR_DIRS);
+        tmpdir.GetAllFiles(r.path,&files,wxEmptyString);
         for(unsigned int i=0;i < files.Count();i ++)
         {
             if(wxFile::Exists(files[i]))
@@ -156,6 +164,7 @@ wxString NoteFileHandler::getNotebookTitle(int itemId)
 
 int NoteFileHandler::createNotebook(wxString notebookTitle, int parentId)
 {
+    listnode tmp(id,parentId,abseek,path);
     return 0;
 }
 
