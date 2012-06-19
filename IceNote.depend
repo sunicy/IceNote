@@ -1902,7 +1902,7 @@
 
 1309417890 i:\wxwidgets2.8\include\wx\mac\carbon\statusbr.h
 
-1340085269 source:i:\icenote\icenotemain.cpp
+1340103220 source:i:\icenote\icenotemain.cpp
 	"IceNoteMain.h"
 	<wx/msgdlg.h>
 	<wx/bitmap.h>
@@ -8892,11 +8892,12 @@
 	"wx/defs.h"
 	"wx/window.h"
 
-1339990718 source:i:\icenote\notefilehandler.cpp
+1340103893 source:i:\icenote\notefilehandler.cpp
 	"NoteFileHandler.h"
 	<wx/filename.h>
+	<vector>
 
-1340091130 i:\icenote\notefilehandler.h
+1340103778 i:\icenote\notefilehandler.h
 	"NoteRelation.h"
 	"NoteItemAbstract.h"
 	"Notetraverser.h"
@@ -8910,12 +8911,12 @@
 
 1340083469 i:\icenote\noterelation.h
 
-1340088486 i:\icenote\noteitemabstract.h
+1340097090 i:\icenote\noteitemabstract.h
 	<wx/string.h>
 	<wx/datetime.h>
 	<wx/richtext/richtextctrl.h>
 
-1340088503 source:i:\icenote\noteitemabstract.cpp
+1340104333 source:i:\icenote\noteitemabstract.cpp
 	"NoteItemAbstract.h"
 
 1340083469 source:i:\icenote\noterelation.cpp

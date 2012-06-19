@@ -284,6 +284,7 @@ IceNoteFrame::IceNoteFrame(wxWindow* parent,wxWindowID id)
 
     Connect(ID_QUIT,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IceNoteFrame::OnQuit);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IceNoteFrame::OnAbout);
+    Connect(wxID_ANY, wxEVT_CLOSE_WINDOW, (wxObjectEventFunction)&IceNoteFrame::OnClose);
     //[STOP]*)
     m_richTextCtrl->SetFocus();
     //SplitterWindow1->Enable(false);
@@ -304,7 +305,7 @@ IceNoteFrame::IceNoteFrame(wxWindow* parent,wxWindowID id)
     } while (dir.GetNext(&t));
 
     SplitterWindow1->Enable(true);
-    m_richTextCtrl->SaveFile(_T("c:\\test.xml"));
+    m_richTextCtrl->SaveFile(_T("d:\\test.xml"));
 }
 
 IceNoteFrame::~IceNoteFrame()
@@ -331,6 +332,9 @@ void IceNoteFrame::OnClose(wxCloseEvent& event)
     {
         saveAbstract(m_currentNoteItemId);
     }
+    delete m_fileHandler;
+    event.Veto();
+    Destroy();
 }
 
 void IceNoteFrame::OnRichTextCtrlPaint(wxPaintEvent& event)
@@ -639,6 +643,7 @@ void IceNoteFrame::buildNoteTreeFromFileHandler()
     {
         NoteRelation noteRelation;
         m_fileHandler->nextRelation(noteRelation); /* of course successful !!*/
+        //wxMessageBox(wxString::Format("%d  %d",noteRelation.getParentId(),noteRelation.getChildId()),"hello re");
         map<int, wxTreeItemId>::iterator it = items.find(noteRelation.getParentId());
         if (it != items.end()) /* if we have found the parent */
         {

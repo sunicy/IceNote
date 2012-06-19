@@ -30,7 +30,7 @@ using namespace std;
 class NoteRecord
 {
     public:
-        NoteRecord(){}
+        NoteRecord();
         /* for a notebook */
         NoteRecord(NoteItemType noteItemType, int itemId, int parentId, wxString notebookTitle);
         /* for a note */
@@ -38,21 +38,23 @@ class NoteRecord
 
         /* some get info */
         NoteItemType getItemType();
-        wxString getItemTitle();
+        wxString getItemTitle();/* both for note and notebook */
         int getItemId();
         int getParentId();
-        NoteRelation getRelationWithParent();
-        NoteItemAbstract getAbstract();
+        NoteRelation getRelationWithParent(); /* both */
+        NoteItemAbstract getAbstract();/* only for notes */
+        wxString getNoteFilename(); /* only for notes, returns the filename without FULL PATH */
 
         /* set info */
         void setItemType(NoteItemType noteItemType);
-        void setItemTitle(wxString title);
+        void setItemTitle(wxString title); /* ONLY for NOTEBOOK */
         void setItemId(int itemId);
         void setParentId(int parentId);
-        void setAbstract(NoteItemAbstract& abstract);
+        void setAbstract(NoteItemAbstract& abstract); /* only for note */
 
         void setValid(bool valid);
         bool isValid();
+
     private:
         NoteItemType m_itemType;
         int m_itemId;
@@ -95,7 +97,7 @@ class NoteFileHandler
         /* get the notebook title, specifying the ItemId; returns -1 if failed */
         wxString getItemTitle(int itemId);
 
-        bool setNoteAbstract(int itemId, const NoteItemAbstract& itemAbstract);
+        bool setNoteAbstract(int itemId, NoteItemAbstract& itemAbstract);
 
     /*
         PART III: Taking actions */
@@ -125,10 +127,14 @@ class NoteFileHandler
         wxTextFile m_cfgFile;      /*the file include all the abstract content*/
 
         int m_currentRelationPos; /* used for "restartRelation" and "nextRelation" */
+        int m_autoIncId;           /* the next ItemId */
         wxString m_cfgDir; /* working dir! */
 
         void loadItemTree();
         void saveItemTree();
+
+        /* delete the item recursively */
+        bool _deleteItem(int itemId);
 };
 
 #endif // NOTEFILEHANDLER_H

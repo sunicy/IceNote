@@ -2,7 +2,8 @@
 
 NoteItemAbstract::NoteItemAbstract()
 {
-    //ctor
+    m_createdTime = wxDateTime::Now();
+    m_lastModified = wxDateTime::Now();
 }
 
 NoteItemAbstract::~NoteItemAbstract()
