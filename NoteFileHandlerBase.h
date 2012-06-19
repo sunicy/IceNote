@@ -1,6 +1,7 @@
 #ifndef NOTEFILEHANDLER_H
 #define NOTEFILEHANDLER_H
 
+
 #include "NoteRelation.h"
 #include "NoteItemAbstract.h"
 #include "Notetraverser.h"

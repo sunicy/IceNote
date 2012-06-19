@@ -1,6 +1,7 @@
 #include "NoteFileHandler.h"
 #include <wx/filename.h>
 
+
 #define CONFIG_FILE ".config"
 NoteFileHandler::NoteFileHandler(wxString docDir):abfile(wxString::Format("%s\\%s", docDir, CONFIG_FILE))
 {
