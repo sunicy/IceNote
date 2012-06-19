@@ -2,7 +2,7 @@
 #include <wx/filename.h>
 
 #define CONFIG_FILE ".config"
-NoteFileHandler::NoteFileHandler(wxString docDir):abfile(wxString::Format("%s/%s", docDir, CONFIG_FILE))
+NoteFileHandler::NoteFileHandler(wxString docDir):abfile(wxString::Format("%s\\%s", docDir, CONFIG_FILE))
 {
     //ctor
     id = 0;
@@ -51,6 +51,14 @@ void NoteFileHandler::get_all_item(wxString& path,wxArrayString& files)
     dir.GetAllFiles(path,&tmparray,wxEmptyString,wxDIR_FILES);
     for(int i=0;i < tmparray.size();i ++)
     {
+        /*
+        #if defined(__WXMSW__)
+            tmparray[i].replace("/","\");
+        #elif defined(__UNIX__)
+            tmparray[i].replace("\","/")
+        #endif
+        */
+
         files.Add(tmparray[i]);
         //wxMessageBox(tmparray[i],"file caution");
     }
@@ -60,7 +68,7 @@ void NoteFileHandler::get_all_item(wxString& path,wxArrayString& files)
         return;
     do
     {
-        files.Add(wxString::Format("%s/%s",path,r));
+        files.Add(wxString::Format("%s\\%s",path,r));
         //wxMessageBox(files.Last(),"dir caution");
         //get_all_item(files.Last(),files);
     }while(dir.GetNext(&r));
@@ -186,31 +194,36 @@ int NoteFileHandler::get_abstract(listnode& r,NoteItemAbstract& itemabs)
 
 int NoteFileHandler::createNote(int parentId)
 {
+    wxMessageBox(wxString::Format("%d",parentId),"erro");
     listnode tmp = tree[parentId];
     wxDateTime now;
     NoteItemAbstract abt(wxString::Format("%d",id),"new note",now.Now(),now.Now());
-    listnode tmpnode(id,parentId,abseek,wxString::Format("%s/%d.xml",tmp.path,id),abt,NIT_NOTE);
+    listnode tmpnode(id,parentId,abseek,wxString::Format("%s\\%d.xml",tmp.path,id),abt,NIT_NOTE);
     tmpnode.modified = 1;
     abseek += 4;
     id ++;
 
+    tree.push_back(tmpnode);
+    wxMessageBox(wxString::Format("%d  %d",tmpnode.itemID,tmpnode.parentID),"createnode");
+    return tmpnode.itemID;
+
     //if(wxFile().Create(tmpnode.path))
-    if(1)
+    /*if(1)
     {
         tree.push_back(tmpnode);
         wxMessageBox(wxString::Format("%d  %d",tmpnode.itemID,tmpnode.parentID),"createnode");
-        /*
+
         abfile.AddLine(wxString::Format("%d",id));
         abfile.AddLine("new note");
         abfile.AddLine(now.Now().Format());
         abfile.AddLine(now.Now().Format());
         abfile.Write();
-        */
+
         return tmpnode.itemID;
     }
 
     else
-        return -1;
+        return -1;*/
 }
 
 /*????????*/
@@ -252,7 +265,7 @@ wxString NoteFileHandler::getNotebookTitle(int itemId)
 int NoteFileHandler::createNotebook(wxString notebookTitle, int parentId)
 {
     listnode parent = tree[parentId];
-    wxString t = wxString::Format("%s/%d",parent.path,id);
+    wxString t = wxString::Format("%s\\%d",parent.path,id);
     wxDir dir;
     wxMessageBox(t,parent.path);
     if(!dir.Make(t))
@@ -262,7 +275,9 @@ int NoteFileHandler::createNotebook(wxString notebookTitle, int parentId)
 
     NoteItemAbstract abt;
     listnode tmp(id,parentId,abseek,t,abt,NIT_DIR);
-    abfile.AddLine(notebookTitle);
+    tmp.abstract.setTitile("new");
+    tree.push_back(tmp);
+    //abfile.AddLine(notebookTitle);
     abseek ++;
     id ++;
     return tmp.itemID;
@@ -385,6 +400,9 @@ void NoteFileHandler::reset_config(listnode& r)
         wxArrayString files;
         get_all_item(r.path,files);
 
+        for(int i=0;i < files.size();i ++)
+            wxMessageBox(files[i],"get_item");
+
         int num = files.Count();
         for(unsigned int i=0;i < num;i ++)
         {
@@ -394,7 +412,8 @@ void NoteFileHandler::reset_config(listnode& r)
             }
             if(wxFile::Exists(files[i]))
             {
-                for(int j=0;j < tree.size();j ++)
+                int j=0;
+                for(j=0;j < tree.size();j ++)
                 {
                     if(tree[j].path.IsSameAs(files[i]))
                     {
@@ -422,6 +441,7 @@ void NoteFileHandler::reset_config(listnode& r)
                 }
                 reset_config(tmpnode);
             }
+            abfile.Write();
         }
     }
 }
