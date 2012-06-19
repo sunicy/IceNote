@@ -37,7 +37,7 @@ bool NoteFileHandler::nextRelation(NoteRelation& noterelation)
     if(tmp.abseek < 0)
         return false;
     NoteRelation tmp_re(tmp.type,tmp.itemID,tmp.parentID);
-    wxMessageBox(wxString::Format("%d  %d",tmp.itemID,tmp.parentID),"re");
+    //wxMessageBox(wxString::Format("%d  %d",tmp.itemID,tmp.parentID),"re");
     current_re_id ++;
     noterelation = tmp_re;
     return true;
@@ -272,7 +272,10 @@ bool NoteFileHandler::deleteItem(int itemId)
 {
     listnode& tmp = tree[itemId];
     if(tmp.type == NIT_NOTE)
+    {
         tmp.abseek = -1;
+        wxRemoveFile(tmp.path);
+    }
      else
         remove_dir(itemId);
     return true;
@@ -344,13 +347,13 @@ void NoteFileHandler::remove_dir(int itemid)
         if(tree[next].type == NIT_NOTE)
         {
             tree[next].abseek = -1;
-            //wxRemoveFile(tree[next].path);
+            wxRemoveFile(tree[next].path);
         }
         else
         {
             tree[next].abseek = -1;
             remove_dir(next);
-            //wxRmdir(tree[next].path);
+            wxRmdir(tree[next].path);
         }
         next ++;
     }
@@ -374,15 +377,85 @@ void NoteFileHandler::count_line(int itemid,int& lines)
     }
 }
 
+void NoteFileHandler::reset_config(listnode& r)
+{
+    if(r.type == NIT_DIR)
+    {
+        wxDir tmpdir(r.path);
+        wxArrayString files;
+        get_all_item(r.path,files);
+
+        int num = files.Count();
+        for(unsigned int i=0;i < num;i ++)
+        {
+            if(wxFileName(files[i]).GetFullName().IsSameAs(".config"))
+            {
+                continue;
+            }
+            if(wxFile::Exists(files[i]))
+            {
+                for(int j=0;j < tree.size();j ++)
+                {
+                    if(tree[j].path.IsSameAs(files[i]))
+                    {
+                        wxMessageBox(files[i],"setfile config");
+                        abfile.AddLine(tree[j].abstract.getTitle());
+                        abfile.AddLine(tree[j].abstract.getTags());
+                        abfile.AddLine(tree[j].abstract.getCreatedTime().Format());
+                        abfile.AddLine(tree[j].abstract.getLastModified().Format());
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                listnode tmpnode = tree[0];
+                for(int j=0;j < tree.size();j ++)
+                {
+                    if(tree[j].path.IsSameAs(files[i]))
+                    {
+                        wxMessageBox(files[i],"setdir config");
+                        abfile.AddLine(tree[j].abstract.getTitle());
+                        tmpnode = tree[j];
+                        break;
+                    }
+                }
+                reset_config(tmpnode);
+            }
+        }
+    }
+}
+
 NoteFileHandler::~NoteFileHandler()
 {
     //dtor
-    for(unsigned int i=1;i < tree.size()-1;i ++)
+    abfile.Clear();
+    //abfile.Create();
+    //abfile.Open();
+    wxMessageBox("woca","hello");
+    reset_config(tree[0]);
+
+    for(unsigned int i=0;i > tree.size();i ++)
     {
-        listnode& parent = tree[i-1];
+        listnode& parent = tree[i];
         listnode& me = tree[i];
 
-        if(me.abseek < 0)
+        if(me.abseek >= 0)
+        {
+            if(me.type == NIT_DIR)
+            {
+                abfile.AddLine(me.abstract.getTitle());
+            }
+            else if(me.type == NIT_NOTE)
+            {
+                abfile.AddLine(me.abstract.getTitle());
+                abfile.AddLine(me.abstract.getTags());
+                abfile.AddLine(me.abstract.getCreatedTime().Format());
+                abfile.AddLine(me.abstract.getLastModified().Format());
+            }
+        }
+
+        if(me.abseek < -10)
         {
             int psize = 0;
             int msize = 0;
@@ -419,4 +492,6 @@ NoteFileHandler::~NoteFileHandler()
             }
         }
     }
+    abfile.Write();
+    abfile.Close();
 }

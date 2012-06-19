@@ -117,6 +117,7 @@ class NoteFileHandler
         int get_title(listnode& r,wxString& abstr);
         void remove_dir(int itemid);
         void count_line(int itemid,int& lines);
+        void reset_config(listnode& r);
         //void insert_abstract(listnode& r);
 
     protected:
