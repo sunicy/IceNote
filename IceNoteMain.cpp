@@ -331,6 +331,7 @@ void IceNoteFrame::OnClose(wxCloseEvent& event)
     wxMessageBox("close","close");
     if (m_currentNoteItemId > 0)
     {
+        m_fileHandler->saveNote(m_currentNoteItemId, *m_richTextCtrl);
         saveAbstract(m_currentNoteItemId);
     }
     delete m_fileHandler;
