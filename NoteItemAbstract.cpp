@@ -58,3 +58,8 @@ void NoteItemAbstract::setLastModified(wxDateTime time)
     m_lastModified = time;
 }
 
+void NoteItemAbstract::setTitle(wxString title)
+{
+    m_title = title;
+}
+

@@ -21,6 +21,7 @@ class NoteItemAbstract
         wxDateTime getLastModified()const;
 
         void setTitile(wxString title);
+        void setTitle(wxString title);
         void setTags(wxString tags);
         void setCreateTime(wxDateTime time);
         void setLastModified(wxDateTime time);

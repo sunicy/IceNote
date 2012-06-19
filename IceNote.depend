@@ -1,10 +1,12 @@
 # depslib dependency file v1.0
-1339812878 source:i:\icenote\icenoteapp.cpp
+1340083469 source:i:\icenote\icenoteapp.cpp
 	"IceNoteApp.h"
 	"IceNoteMain.h"
 	<wx/image.h>
+	<wx/richtext/richtextbuffer.h>
+	<wx/richtext/richtextxml.h>
 
-1339654127 i:\icenote\icenoteapp.h
+1340083469 i:\icenote\icenoteapp.h
 	<wx/app.h>
 
 1309417974 i:\wxwidgets2.8\include\wx\app.h
@@ -1736,7 +1738,7 @@
 1309417858 i:\wxwidgets2.8\include\wx\univ\theme.h
 	"wx/string.h"
 
-1339991436 i:\icenote\icenotemain.h
+1340083523 i:\icenote\icenotemain.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -1900,7 +1902,7 @@
 
 1309417890 i:\wxwidgets2.8\include\wx\mac\carbon\statusbr.h
 
-1339995437 source:i:\icenote\icenotemain.cpp
+1340085269 source:i:\icenote\icenotemain.cpp
 	"IceNoteMain.h"
 	<wx/msgdlg.h>
 	<wx/bitmap.h>
@@ -2027,7 +2029,7 @@
 	"wx/defs.h"
 	"wx/dialog.h"
 
-1333917710 source:i:\icenote\resource.rc
+1340083469 source:i:\icenote\resource.rc
 	"wx/msw/wx.rc"
 
 1309417918 i:\wxwidgets2.8\include\wx\msw\wx.rc
@@ -8894,28 +8896,29 @@
 	"NoteFileHandler.h"
 	<wx/filename.h>
 
-1339988835 i:\icenote\notefilehandler.h
+1340091130 i:\icenote\notefilehandler.h
 	"NoteRelation.h"
 	"NoteItemAbstract.h"
 	"Notetraverser.h"
-	<fstream>
 	<vector>
-	<wx/dir.h>
+	<map>
 	<wx/file.h>
 	<wx/textfile.h>
 	<wx/filefn.h>
+	<wx/msgdlg.h>
+	<wx/datetime.h>
 
-1339940372 i:\icenote\noterelation.h
+1340083469 i:\icenote\noterelation.h
 
-1339983982 i:\icenote\noteitemabstract.h
+1340088486 i:\icenote\noteitemabstract.h
 	<wx/string.h>
 	<wx/datetime.h>
 	<wx/richtext/richtextctrl.h>
 
-1339984024 source:i:\icenote\noteitemabstract.cpp
+1340088503 source:i:\icenote\noteitemabstract.cpp
 	"NoteItemAbstract.h"
 
-1339940422 source:i:\icenote\noterelation.cpp
+1340083469 source:i:\icenote\noterelation.cpp
 	"NoteRelation.h"
 
 1339848238 i:\icenote\wximages\icenotemain_toolbarimagelist.xpm
@@ -8957,10 +8960,10 @@
 
 1323888240 i:\wxwidgets293\include\wx\palmos\stattext.h
 
-1339935859 source:i:\icenote\notetreeitemdata.cpp
+1340083469 source:i:\icenote\notetreeitemdata.cpp
 	"NoteTreeItemData.h"
 
-1339934770 i:\icenote\notetreeitemdata.h
+1340083469 i:\icenote\notetreeitemdata.h
 	<wx/treebase.h>
 	"NoteRelation.h"
 
@@ -9370,9 +9373,13 @@
 1323888240 i:\wxwidgets293\include\wx\richtext\richtextuicustomization.h
 	"wx/window.h"
 
-1339959734 i:\icenote\notetraverser.h
+1340083469 i:\icenote\notetraverser.h
 	<wx/dir.h>
 
-1339900942 source:i:\icenote\notetraverser.cpp
+1340083469 source:i:\icenote\notetraverser.cpp
 	<wx/dir.h>
+
+1323888240 i:\wxwidgets293\include\wx\richtext\richtextxml.h
+	"wx/richtext/richtextbuffer.h"
+	"wx/richtext/richtextstyles.h"
 
