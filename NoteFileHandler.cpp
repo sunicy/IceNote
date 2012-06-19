@@ -10,17 +10,18 @@ NoteFileHandler::NoteFileHandler(wxString docDir):abfile(wxString::Format("%s/%s
     current_re_id = 0;
     //wxSetWorkingDirectory("##");
     current_path = docDir;
-    listnode root(id,id,abseek,current_path,NIT_DIR);
+    NoteItemAbstract abt;
+    listnode root(id,id,abseek,current_path,abt,NIT_DIR);
     tree.push_back(root);
     id ++;
     abseek ++;
 
-    init_tree(root);
-
-
     if (!abfile.Exists())
         abfile.Create();
     abfile.Open();
+
+    init_tree(root);
+
 }
 
 void NoteFileHandler::restartRelations()
@@ -36,7 +37,7 @@ bool NoteFileHandler::nextRelation(NoteRelation& noterelation)
     if(tmp.abseek < 0)
         return false;
     NoteRelation tmp_re(tmp.type,tmp.itemID,tmp.parentID);
-    //wxMessageBox(wxString::Format("%d  %d",tmp.itemID,tmp.parentID),"re");
+    wxMessageBox(wxString::Format("%d  %d",tmp.itemID,tmp.parentID),"re");
     current_re_id ++;
     noterelation = tmp_re;
     return true;
@@ -95,21 +96,29 @@ void NoteFileHandler::init_tree(listnode& r)
 //wxMessageBox(wxFileName(files[i]).GetFullName(),"hello");
             if(wxFileName(files[i]).GetFullName().IsSameAs(".config"))
             {
-                wxMessageBox(files[i],"config caution");
+                //wxMessageBox(files[i],"config caution");
                 continue;
             }
             if(wxFile::Exists(files[i]))
             {
-                listnode tmpnode(id,r.itemID,abseek,files[i],NIT_NOTE);
-                wxMessageBox(files[i],"caution");
+                NoteItemAbstract abt;
+                listnode tmpnode(id,r.itemID,abseek,files[i],abt,NIT_NOTE);
+                get_abstract(tmpnode,abt);
+                tmpnode.abstract = abt;
+                //wxMessageBox(wxString::Format("%s/%s/%s/%s",tmpnode.abstract.getTitle()),"getabs");
+                wxMessageBox(tmpnode.abstract.getTitle(),"caution");
                 tree.push_back(tmpnode);
                 id ++;
                 abseek += 4;
             }
             else
             {
-                listnode tmpnode(id,r.itemID,abseek,files[i],NIT_DIR);
-                wxMessageBox(files[i],"caution");
+                NoteItemAbstract abt;
+                listnode tmpnode(id,r.itemID,abseek,files[i],abt,NIT_DIR);
+                wxString title;
+                get_title(tmpnode,title);
+                tmpnode.abstract.setTitile(title);
+                wxMessageBox(title,"caution");
                 tree.push_back(tmpnode);
                 id ++;
                 abseek ++;
@@ -122,9 +131,9 @@ void NoteFileHandler::init_tree(listnode& r)
 wxString NoteFileHandler::getItemTitle(int itemId)
 {
     listnode& tmp = tree[itemId];
-    wxString str;
-    get_title(tmp,str);
-    return str;
+    //wxString str;
+    //get_title(tmp,str);
+    return tmp.abstract.getTitle();
 }
 
 int NoteFileHandler::get_title(listnode& r,wxString& abstr)
@@ -140,6 +149,7 @@ int NoteFileHandler::get_title(listnode& r,wxString& abstr)
         str = abfile.GetNextLine();
     }
     abstr = str;
+    r.modified = 1;
     return 1;
 }
 
@@ -154,6 +164,7 @@ int NoteFileHandler::get_abstract(listnode& r,NoteItemAbstract& itemabs)
     {
         return 0;
     }
+
     m_title = abfile.GetFirstLine();
     for(int i=1;i < r.abseek;i ++)
     {
@@ -167,24 +178,34 @@ int NoteFileHandler::get_abstract(listnode& r,NoteItemAbstract& itemabs)
     itemabs.setTags(m_tags);
     itemabs.setCreateTime(m_createdTime);
     itemabs.setLastModified(m_lastModified);
+    r.abstract = itemabs;
+    r.modified = 1;
+    wxMessageBox(wxString::Format("%s/%s/%s/%s",m_title,m_tags,m_createdTime.Format(),m_lastModified.Format()),"getabs");
     return 1;
 }
 
 int NoteFileHandler::createNote(int parentId)
 {
     listnode tmp = tree[parentId];
-    listnode tmpnode(id,parentId,abseek,wxString::Format("%s/%d",tmp.path,id),NIT_NOTE);
+    wxDateTime now;
+    NoteItemAbstract abt(wxString::Format("%d",id),"new note",now.Now(),now.Now());
+    listnode tmpnode(id,parentId,abseek,wxString::Format("%s/%d.xml",tmp.path,id),abt,NIT_NOTE);
+    tmpnode.modified = 1;
     abseek += 4;
     id ++;
 
-    if(wxFile().Create(tmpnode.path))
+    //if(wxFile().Create(tmpnode.path))
+    if(1)
     {
-        wxDateTime now;
         tree.push_back(tmpnode);
+        wxMessageBox(wxString::Format("%d  %d",tmpnode.itemID,tmpnode.parentID),"createnode");
+        /*
         abfile.AddLine(wxString::Format("%d",id));
         abfile.AddLine("new note");
         abfile.AddLine(now.Now().Format());
         abfile.AddLine(now.Now().Format());
+        abfile.Write();
+        */
         return tmpnode.itemID;
     }
 
@@ -207,8 +228,12 @@ bool NoteFileHandler::isEof()
 bool NoteFileHandler::getNoteAbstract(int itemId, NoteItemAbstract& itemAbstract)
 {
     listnode& tmp = tree[itemId];
-    if(get_abstract(tmp,itemAbstract))
+    if(tmp.modified != 0)
+    {
+        itemAbstract = tmp.abstract;
         return true;
+    }
+
     return false;
 }
 
@@ -216,8 +241,11 @@ wxString NoteFileHandler::getNotebookTitle(int itemId)
 {
     listnode& tmp = tree[itemId];
     wxString str;
-    if(get_title(tmp,str))
-        return str;
+    if(tmp.modified != 0)
+    {
+        return tmp.abstract.getTitle();
+    }
+
     return "";
 }
 
@@ -232,7 +260,8 @@ int NoteFileHandler::createNotebook(wxString notebookTitle, int parentId)
         return -1;
     }
 
-    listnode tmp(id,parentId,abseek,t,NIT_DIR);
+    NoteItemAbstract abt;
+    listnode tmp(id,parentId,abseek,t,abt,NIT_DIR);
     abfile.AddLine(notebookTitle);
     abseek ++;
     id ++;
@@ -242,24 +271,36 @@ int NoteFileHandler::createNotebook(wxString notebookTitle, int parentId)
 bool NoteFileHandler::deleteItem(int itemId)
 {
     listnode& tmp = tree[itemId];
-    tmp.abseek = -1;
+    if(tmp.type == NIT_NOTE)
+        tmp.abseek = -1;
+     else
+        remove_dir(itemId);
     return true;
 }
 
 bool NoteFileHandler::saveNote(int itemId, wxRichTextCtrl& textCtrl)
 {
-
+    textCtrl.SaveFile(tree[itemId].path);
     return true;
 }
 
 bool NoteFileHandler::openNote(int itemId, wxRichTextCtrl& textCtrl)
 {
     listnode tmp = tree[itemId];
+
     if(tmp.abseek < 0)
     {
         return false;
     }
-    return true;
+    bool op;
+    if (wxFile::Exists(tmp.path))
+        op = textCtrl.LoadFile(tmp.path);
+    else
+    {
+        textCtrl.Clear();
+        op = true;
+    }
+    return op;
 }
 
 bool NoteFileHandler::setNoteAbstract(int itemId, const NoteItemAbstract& itemAbstract)
@@ -267,16 +308,21 @@ bool NoteFileHandler::setNoteAbstract(int itemId, const NoteItemAbstract& itemAb
     listnode& tmp = tree[itemId];
     if(tmp.abseek < 0)
         return false;
+    tmp.abstract = itemAbstract;
+    tmp.modified = 1;
+        /*
     if(itemId < id - 1)
     {
         for(int i=0;i < 4;i ++)
         {
             abfile.RemoveLine(tmp.abseek + i);
         }
+        wxMessageBox(wxString::Format("%s/%s/%s/%s",itemAbstract.getTitle(),itemAbstract.getTags(),itemAbstract.getCreatedTime().Format(),itemAbstract.getLastModified().Format()),"setabs");
         abfile.InsertLine(itemAbstract.getTitle(),tmp.abseek);
         abfile.InsertLine(itemAbstract.getTags(),tmp.abseek + 1);
         abfile.InsertLine(itemAbstract.getCreatedTime().Format(),tmp.abseek + 2);
         abfile.InsertLine(itemAbstract.getLastModified().Format(),tmp.abseek + 3);
+        abfile.Write();
     }
     else
     {
@@ -284,7 +330,9 @@ bool NoteFileHandler::setNoteAbstract(int itemId, const NoteItemAbstract& itemAb
         abfile.AddLine(itemAbstract.getTags());
         abfile.AddLine(itemAbstract.getCreatedTime().Format());
         abfile.AddLine(itemAbstract.getLastModified().Format());
+        abfile.Write();
     }
+    */
     return true;
 }
 
@@ -295,12 +343,14 @@ void NoteFileHandler::remove_dir(int itemid)
     {
         if(tree[next].type == NIT_NOTE)
         {
-            wxRemoveFile(tree[next].path);
+            tree[next].abseek = -1;
+            //wxRemoveFile(tree[next].path);
         }
         else
         {
+            tree[next].abseek = -1;
             remove_dir(next);
-            wxRmdir(tree[next].path);
+            //wxRmdir(tree[next].path);
         }
         next ++;
     }

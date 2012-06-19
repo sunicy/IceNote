@@ -12,6 +12,7 @@
 #include <wx/filefn.h>
 #include <wx/msgdlg.h>
 #include <wx/datetime.h>
+#include <wx/richtext/richtextctrl.h>
 
 using std::vector;
 
@@ -29,7 +30,7 @@ class listnode
 {
     public:
 
-    listnode(int itemID,int parentID,int abseek,wxString path,NoteItemType type)
+    listnode(int itemID,int parentID,int abseek,wxString path,NoteItemAbstract& abst,NoteItemType type,int modified = 0):abstract(abst)
     {
         this->itemID = itemID;
         this->parentID = parentID;
@@ -37,8 +38,9 @@ class listnode
         this->path = path;
         this->type = type;
     }
-    listnode(const listnode& node)
+    listnode(const listnode& node):abstract(node.abstract)
     {
+        this->modified = node.modified;
         this->itemID = node.itemID;
         this->parentID = node.parentID;
         this->abseek = node.abseek;
@@ -46,10 +48,12 @@ class listnode
         this->type = node.type;
     }
 
+        int modified;
         int itemID;
         int parentID;
         int abseek;
         wxString path;
+        NoteItemAbstract abstract;
         NoteItemType type;
 };
 
