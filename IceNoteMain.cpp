@@ -334,6 +334,8 @@ void IceNoteFrame::OnClose(wxCloseEvent& event)
         saveAbstract(m_currentNoteItemId);
     }
     delete m_fileHandler;
+    event.Veto();
+    Destroy();
 }
 
 void IceNoteFrame::OnRichTextCtrlPaint(wxPaintEvent& event)
