@@ -1,8 +1,12 @@
 #include "NoteFileHandler.h"
 #include <wx/filename.h>
+#include <vector>
+
+using namespace std;
 
 
 #define CONFIG_FILE ".config"
+<<<<<<< HEAD:NoteBaseFileHandler.cpp
 NoteFileHandler::NoteFileHandler(wxString docDir):abfile(wxString::Format("%s\\%s", docDir, CONFIG_FILE))
 {
     //ctor
@@ -23,30 +27,50 @@ NoteFileHandler::NoteFileHandler(wxString docDir):abfile(wxString::Format("%s\\%
 
     init_tree(root);
 
+=======
+
+NoteRecord::NoteRecord(NoteItemType noteItemType, int itemId, int parentId, wxString notebookTitle) :
+    m_itemType(noteItemType), m_itemId(itemId), m_paretnId(parentId), m_notebookTitle(notebookTitle), m_valid(true)
+{}
+
+NoteRecord::NoteRecord(NoteItemType noteItemType, int itemId, int parentId, const NoteItemAbstract& abstract) :
+    m_itemType(noteItemType), m_itemId(itemId), m_paretnId(parentId),m_abstract(abstract), m_valid(true)
+{}
+NoteRecord::NoteRecord() : m_valid(true)
+{}
+
+NoteItemType NoteRecord::getItemType()
+{
+    return m_itemType;
+>>>>>>> SimpleFileHandler:NoteFileHandler.cpp
 }
 
-void NoteFileHandler::restartRelations()
+wxString NoteRecord::getItemTitle()
 {
-    current_re_id = 0;
+    if (m_itemType == NIT_DIR)
+        return m_notebookTitle;
+    else
+        return m_abstract.getTitle();
 }
 
-bool NoteFileHandler::nextRelation(NoteRelation& noterelation)
+int NoteRecord::getItemId()
 {
-    int next_re = current_re_id + 1;
-
-    listnode& tmp = tree[next_re];
-    if(tmp.abseek < 0)
-        return false;
-    NoteRelation tmp_re(tmp.type,tmp.itemID,tmp.parentID);
-    //wxMessageBox(wxString::Format("%d  %d",tmp.itemID,tmp.parentID),"re");
-    current_re_id ++;
-    noterelation = tmp_re;
-    return true;
+    return m_itemId;
 }
 
-
-void NoteFileHandler::get_all_item(wxString& path,wxArrayString& files)
+int NoteRecord::getParentId()
 {
+    return m_paretnId;
+}
+
+NoteRelation NoteRecord::getRelationWithParent()
+{
+    return NoteRelation(m_itemType, m_itemId, m_paretnId);
+}
+
+NoteItemAbstract NoteRecord::getAbstract()
+{
+<<<<<<< HEAD:NoteBaseFileHandler.cpp
     wxDir dir(path);
     wxArrayString tmparray;
     dir.GetAllFiles(path,&tmparray,wxEmptyString,wxDIR_FILES);
@@ -73,18 +97,35 @@ void NoteFileHandler::get_all_item(wxString& path,wxArrayString& files)
         //wxMessageBox(files.Last(),"dir caution");
         //get_all_item(files.Last(),files);
     }while(dir.GetNext(&r));
-
+=======
+    return m_abstract;
 }
 
-
-void NoteFileHandler::init_tree(listnode& r)
+wxString NoteRecord::getNoteFilename()
 {
-    /*
-    tree.insert(tree.end(),r);
-    id ++;
-    abseek ++;
-    */
+    if (m_itemType == NIT_NOTE)
+        return wxString::Format(_T("icenote_%d"), m_itemId);
+    else
+        return wxEmptyString;
+}
+>>>>>>> SimpleFileHandler:NoteFileHandler.cpp
 
+void NoteRecord::setItemType(NoteItemType noteItemType)
+{
+    m_itemType = noteItemType;
+}
+
+void NoteRecord::setItemTitle(wxString title)
+{
+    m_notebookTitle = title;
+}
+
+void NoteRecord::setItemId(int itemId)
+{
+    m_itemId = itemId;
+}
+
+<<<<<<< HEAD:NoteBaseFileHandler.cpp
     if(r.type == NIT_DIR)
     {
         wxDir tmpdir(r.path);
@@ -135,18 +176,29 @@ void NoteFileHandler::init_tree(listnode& r)
             }
         }
     }
+=======
+void NoteRecord::setParentId(int parentId)
+{
+    m_paretnId = parentId;
+>>>>>>> SimpleFileHandler:NoteFileHandler.cpp
 }
 
-wxString NoteFileHandler::getItemTitle(int itemId)
+void NoteRecord::setAbstract(NoteItemAbstract& abstract)
 {
+<<<<<<< HEAD:NoteBaseFileHandler.cpp
     listnode& tmp = tree[itemId];
     //wxString str;
     //get_title(tmp,str);
     return tmp.abstract.getTitle();
+=======
+    m_abstract = NoteItemAbstract(abstract);
+>>>>>>> SimpleFileHandler:NoteFileHandler.cpp
 }
 
-int NoteFileHandler::get_title(listnode& r,wxString& abstr)
+
+void NoteRecord::setValid(bool valid = true)
 {
+<<<<<<< HEAD:NoteBaseFileHandler.cpp
     wxString str;
     if(r.abseek < 0)
     {
@@ -160,15 +212,17 @@ int NoteFileHandler::get_title(listnode& r,wxString& abstr)
     abstr = str;
     r.modified = 1;
     return 1;
+=======
+    m_valid = valid;
+>>>>>>> SimpleFileHandler:NoteFileHandler.cpp
 }
 
-int NoteFileHandler::get_abstract(listnode& r,NoteItemAbstract& itemabs)
+bool NoteRecord::isValid()
 {
-    wxString m_title;           /* Note's title */
-    wxString m_tags;            /* Note's tag */
-    wxDateTime m_createdTime;   /* Note's Created Time */
-    wxDateTime m_lastModified;  /* Note's LastModified Time */
+    return m_valid;
+}
 
+<<<<<<< HEAD:NoteBaseFileHandler.cpp
     if(r.abseek < 0)
     {
         return 0;
@@ -176,9 +230,43 @@ int NoteFileHandler::get_abstract(listnode& r,NoteItemAbstract& itemabs)
 
     m_title = abfile.GetFirstLine();
     for(int i=1;i < r.abseek;i ++)
+=======
+/* FOARMAT:
+    NEXT_ITEMID
+    ...
+    ...
+    ITEM_TYPE
+    ITEM_ID
+    PARENT_ID
+    [NOTEBOOK_TITLE] <-- if notebook
+    [
+    NOTE_TITLE
+    NOTE_TAGS       <-- if note
+    NOTE_CREATED_TIME
+    NOTE_MODIFIED_TIME
+    ]
+*/
+
+
+wxTextFile& operator<<(wxTextFile& file, NoteRecord& noteRecord)
+{
+    /* Basic common info */
+    file.AddLine(wxString::Format(_T("%d"), noteRecord.getItemType()));
+    file.AddLine(wxString::Format(_T("%d"), noteRecord.getItemId()));
+    file.AddLine(wxString::Format(_T("%d"), noteRecord.getParentId()));
+
+    if (noteRecord.getItemType() == NIT_DIR) /* if a directory, just write the title */
+        file.AddLine(noteRecord.getItemTitle());
+    else /* note: save the abstract! */
+>>>>>>> SimpleFileHandler:NoteFileHandler.cpp
     {
-        m_title = abfile.GetNextLine();
+        NoteItemAbstract abstract = noteRecord.getAbstract();
+        file.AddLine(abstract.getTitle());
+        file.AddLine(abstract.getTags());
+        file.AddLine(abstract.getCreatedTime().Format());
+        file.AddLine(abstract.getLastModified().Format());
     }
+<<<<<<< HEAD:NoteBaseFileHandler.cpp
     //m_title = abfile.GetCurrentLine();
     m_tags = abfile.GetNextLine();
     m_createdTime.ParseDateTime(abfile.GetNextLine());
@@ -191,10 +279,16 @@ int NoteFileHandler::get_abstract(listnode& r,NoteItemAbstract& itemabs)
     r.modified = 1;
     wxMessageBox(wxString::Format("%s/%s/%s/%s",m_title,m_tags,m_createdTime.Format(),m_lastModified.Format()),"getabs");
     return 1;
+=======
+    /* write back! */
+    file.Write();
+    return file;
+>>>>>>> SimpleFileHandler:NoteFileHandler.cpp
 }
 
-int NoteFileHandler::createNote(int parentId)
+wxTextFile& operator>>(wxTextFile& file, NoteRecord& noteRecord)
 {
+<<<<<<< HEAD:NoteBaseFileHandler.cpp
     wxMessageBox(wxString::Format("%d",parentId),"erro");
     listnode tmp = tree[parentId];
     wxDateTime now;
@@ -221,26 +315,54 @@ int NoteFileHandler::createNote(int parentId)
         abfile.Write();
 
         return tmpnode.itemID;
-    }
+=======
+    /* Basic common info */
+    noteRecord.setItemType((NoteItemType)wxAtoi(file.GetNextLine()));
+    noteRecord.setItemId(wxAtoi(file.GetNextLine()));
+    noteRecord.setParentId(wxAtoi(file.GetNextLine()));
 
+    if (noteRecord.getItemType() == NIT_DIR) /* if a directory, just write the title */
+        noteRecord.setItemTitle(file.GetNextLine());
+    else /* note: save the abstract! */
+    {
+        NoteItemAbstract abstract;
+        abstract.setTitle(file.GetNextLine());
+        abstract.setTags(file.GetNextLine());
+        wxDateTime dt;
+        dt.ParseDateTime(file.GetNextLine());
+        abstract.setCreateTime(dt);
+        dt.ParseDateTime(file.GetNextLine());
+        abstract.setLastModified(dt);
+        noteRecord.setAbstract(abstract);
+>>>>>>> SimpleFileHandler:NoteFileHandler.cpp
+    }
+    return file;
+}
+
+<<<<<<< HEAD:NoteBaseFileHandler.cpp
     else
         return -1;*/
+=======
+NoteFileHandler::NoteFileHandler(wxString docDir) : m_cfgDir(docDir)
+{
+    loadItemTree();
+    restartRelations(); /* reset! */
+>>>>>>> SimpleFileHandler:NoteFileHandler.cpp
 }
 
-/*????????*/
-bool NoteFileHandler::isEof()
+NoteFileHandler::~NoteFileHandler()
 {
-    if(current_re_id < id-1)
-    {
-        //wxMessageBox(wxString::Format("%d",current_re_id),"reId");
-        return false;
-    }
-
-    return true;
+    saveItemTree();
 }
 
-bool NoteFileHandler::getNoteAbstract(int itemId, NoteItemAbstract& itemAbstract)
+void NoteFileHandler::restartRelations()
 {
+    m_currentRelationPos = 0; /* goto the 0 */
+}
+
+bool NoteFileHandler::nextRelation(NoteRelation& noteRelation)
+{
+<<<<<<< HEAD:NoteBaseFileHandler.cpp
     listnode& tmp = tree[itemId];
     if(tmp.modified != 0)
     {
@@ -249,10 +371,21 @@ bool NoteFileHandler::getNoteAbstract(int itemId, NoteItemAbstract& itemAbstract
     }
 
     return false;
+=======
+    for (; m_currentRelationPos < m_noteRecords.size(); m_currentRelationPos++)
+        if (m_noteRecords[m_currentRelationPos].isValid()) /* skip all invalid nodes! */
+        {
+            noteRelation = m_noteRecords[m_currentRelationPos].getRelationWithParent();
+            m_currentRelationPos++;
+            return true; /* YES! */
+        }
+    return false; /* end of records! */
+>>>>>>> SimpleFileHandler:NoteFileHandler.cpp
 }
 
-wxString NoteFileHandler::getNotebookTitle(int itemId)
+bool NoteFileHandler::isEof()
 {
+<<<<<<< HEAD:NoteBaseFileHandler.cpp
     listnode& tmp = tree[itemId];
     wxString str;
     if(tmp.modified != 0)
@@ -261,10 +394,14 @@ wxString NoteFileHandler::getNotebookTitle(int itemId)
     }
 
     return "";
+=======
+    return m_currentRelationPos >= m_noteRecords.size();
+>>>>>>> SimpleFileHandler:NoteFileHandler.cpp
 }
 
-int NoteFileHandler::createNotebook(wxString notebookTitle, int parentId)
+bool NoteFileHandler::getNoteAbstract(int itemId, NoteItemAbstract& itemAbstract)
 {
+<<<<<<< HEAD:NoteBaseFileHandler.cpp
     listnode parent = tree[parentId];
     wxString t = wxString::Format("%s\\%d",parent.path,id);
     wxDir dir;
@@ -282,10 +419,28 @@ int NoteFileHandler::createNotebook(wxString notebookTitle, int parentId)
     abseek ++;
     id ++;
     return tmp.itemID;
+=======
+    map<int, int>::iterator it = m_itemIdMap.find(itemId);
+    if (it == m_itemIdMap.end()) /* if not found! */
+        return false;
+    if (m_noteRecords[it->second].getItemType() == NIT_DIR)
+        return false; /* notebooks don't have abstracts */
+    itemAbstract = m_noteRecords[it->second].getAbstract();
+    return true;
 }
 
-bool NoteFileHandler::deleteItem(int itemId)
+wxString NoteFileHandler::getItemTitle(int itemId)
 {
+    map<int, int>::iterator it = m_itemIdMap.find(itemId);
+    if (it == m_itemIdMap.end()) /* if not found! */
+        return wxEmptyString;
+    return m_noteRecords[it->second].getItemTitle();
+>>>>>>> SimpleFileHandler:NoteFileHandler.cpp
+}
+
+bool NoteFileHandler::setNoteAbstract(int itemId, NoteItemAbstract& itemAbstract)
+{
+<<<<<<< HEAD:NoteBaseFileHandler.cpp
     listnode& tmp = tree[itemId];
     if(tmp.type == NIT_NOTE)
     {
@@ -295,16 +450,58 @@ bool NoteFileHandler::deleteItem(int itemId)
      else
         remove_dir(itemId);
     return true;
+=======
+    map<int, int>::iterator it = m_itemIdMap.find(itemId);
+    if (it == m_itemIdMap.end()) /* if not found! */
+        return false;
+    m_noteRecords[it->second].setAbstract(itemAbstract);
+    //saveItemTree();
+>>>>>>> SimpleFileHandler:NoteFileHandler.cpp
 }
 
-bool NoteFileHandler::saveNote(int itemId, wxRichTextCtrl& textCtrl)
+int NoteFileHandler::createNote(int parentId)
 {
+<<<<<<< HEAD:NoteBaseFileHandler.cpp
     textCtrl.SaveFile(tree[itemId].path);
     return true;
+=======
+    map<int, int>::iterator it = m_itemIdMap.find(parentId);
+    if (it == m_itemIdMap.end() || m_noteRecords[it->second].getItemType() != NIT_DIR)
+        return -1; /* invalid! */
+    NoteRecord r;
+    r.setParentId(parentId);
+    r.setItemId(m_autoIncId);
+    r.setItemType(NIT_NOTE);
+    /* add it into vector and MAP! */
+    m_noteRecords.push_back(r);
+    m_itemIdMap.insert(map<int, int>::value_type(r.getItemId(), m_noteRecords.size() - 1));
+    m_autoIncId++;
+    //saveItemTree(); /* save it ! */
+    return m_autoIncId - 1;
 }
 
-bool NoteFileHandler::openNote(int itemId, wxRichTextCtrl& textCtrl)
+int NoteFileHandler::createNotebook(wxString notebookTitle, int parentId)
 {
+    map<int, int>::iterator it = m_itemIdMap.find(parentId);
+    if (it == m_itemIdMap.end() || m_noteRecords[it->second].getItemType() != NIT_DIR)
+        return -1; /* invalid! */
+    NoteRecord r;
+    r.setParentId(parentId);
+    r.setItemId(m_autoIncId);
+    r.setItemType(NIT_DIR);
+    r.setItemTitle(notebookTitle);
+    /* add it into vector and MAP! */
+    m_noteRecords.push_back(r);
+    m_itemIdMap.insert(map<int, int>::value_type(r.getItemId(), m_noteRecords.size() - 1));
+    m_autoIncId++;
+    //saveItemTree(); /* save it! */
+    return m_autoIncId - 1;
+>>>>>>> SimpleFileHandler:NoteFileHandler.cpp
+}
+
+bool NoteFileHandler::deleteItem(int itemId)
+{
+<<<<<<< HEAD:NoteBaseFileHandler.cpp
     listnode tmp = tree[itemId];
 
     if(tmp.abseek < 0)
@@ -320,10 +517,17 @@ bool NoteFileHandler::openNote(int itemId, wxRichTextCtrl& textCtrl)
         op = true;
     }
     return op;
+=======
+    bool f = _deleteItem(itemId);
+    //saveItemTree();
+    return f;
+>>>>>>> SimpleFileHandler:NoteFileHandler.cpp
 }
 
-bool NoteFileHandler::setNoteAbstract(int itemId, const NoteItemAbstract& itemAbstract)
+/* if a note, delete it; otherwise delete all sub-nodes */
+bool NoteFileHandler::_deleteItem(int itemId)
 {
+<<<<<<< HEAD:NoteBaseFileHandler.cpp
     listnode& tmp = tree[itemId];
     if(tmp.abseek < 0)
         return false;
@@ -352,11 +556,33 @@ bool NoteFileHandler::setNoteAbstract(int itemId, const NoteItemAbstract& itemAb
         abfile.Write();
     }
     */
+=======
+    map<int, int>::iterator it = m_itemIdMap.find(itemId);
+    if (it == m_itemIdMap.end())
+        return false; /* invalid! */
+    /* mark itself as invalid */
+    m_noteRecords[it->second].setValid(false);
+
+    /* well, directory? let's recursively handle it! */
+    if (m_noteRecords[it->second].getItemType() == NIT_DIR)
+    {
+        for (int i = it->second + 1; i < m_noteRecords.size(); i++)
+            if (m_noteRecords[i].getParentId() == itemId) /* if is a child */
+                deleteItem(m_noteRecords[i].getItemId());
+    }
+
+    /* if it is the last element in vector, delete it right now */
+    if (it->second == m_noteRecords.size() - 1)
+        m_noteRecords.erase(m_noteRecords.end() - 1);
+    /* remove itself from the map */
+    m_itemIdMap.erase(it);
+>>>>>>> SimpleFileHandler:NoteFileHandler.cpp
     return true;
 }
 
-void NoteFileHandler::remove_dir(int itemid)
+bool NoteFileHandler::saveNote(int itemId, wxRichTextCtrl& textCtrl)
 {
+<<<<<<< HEAD:NoteBaseFileHandler.cpp
     int next = itemid + 1;
     while(tree[next].parentID == itemid)
     {
@@ -373,26 +599,25 @@ void NoteFileHandler::remove_dir(int itemid)
         }
         next ++;
     }
+=======
+    map<int, int>::iterator it = m_itemIdMap.find(itemId);
+    if (it == m_itemIdMap.end())
+        return false; /* invalid! */
+    textCtrl.SaveFile(wxString::Format(_T("%s/%s"), m_cfgDir, m_noteRecords[it->second].getNoteFilename()), wxRICHTEXT_TYPE_XML);
+    return true;
+>>>>>>> SimpleFileHandler:NoteFileHandler.cpp
 }
 
-void NoteFileHandler::count_line(int itemid,int& lines)
+bool NoteFileHandler::openNote(int itemId, wxRichTextCtrl& textCtrl)
 {
-    int next = itemid + 1;
-    while(tree[next].parentID == itemid)
-    {
-        if(tree[next].type == NIT_NOTE)
-        {
-            lines += 4;
-        }
-        else
-        {
-            lines += 1;
-            count_line(next,lines);
-        }
-        next ++;
-    }
+    map<int, int>::iterator it = m_itemIdMap.find(itemId);
+    if (it == m_itemIdMap.end())
+        return false; /* invalid! */
+    textCtrl.LoadFile(wxString::Format(_T("%s/%s"), m_cfgDir, m_noteRecords[it->second].getNoteFilename()), wxRICHTEXT_TYPE_XML);
+    return true;
 }
 
+<<<<<<< HEAD:NoteBaseFileHandler.cpp
 void NoteFileHandler::reset_config(listnode& r)
 {
     if(r.type == NIT_DIR)
@@ -477,42 +702,56 @@ NoteFileHandler::~NoteFileHandler()
         }
 
         if(me.abseek < -10)
+=======
+void NoteFileHandler::loadItemTree()
+{
+    m_noteRecords.clear();
+    m_itemIdMap.clear();
+    /* add the root! */
+    m_itemIdMap.insert(map<int, int>::value_type(0, 0));
+    NoteRecord r(NIT_DIR, 0, -1, _T(""));
+    m_noteRecords.push_back(r);
+    wxTextFile f(wxString::Format(_T("%s/%s"), m_cfgDir, CONFIG_FILE));
+    m_autoIncId = 1; /* never be ZERO! cuz root = zero */
+
+    if (wxFile::Exists(f.GetName())) /* if exists, open & parse it */
+    {
+        f.Open();
+        //f.GetFirstLine();
+        /* parse it! */
+        m_autoIncId = wxAtoi(f.GetFirstLine());
+
+        while (!f.Eof())
+>>>>>>> SimpleFileHandler:NoteFileHandler.cpp
         {
-            int psize = 0;
-            int msize = 0;
-            if(parent.type == NIT_DIR)
-            {
-                 psize = 1;
-            }
+            if (f.GetNextLine() == wxEmptyString)
+                break; /* empty line! */
             else
-            {
-                psize = 4;
-            }
-
-            if(me.type == NIT_DIR)
-            {
-                count_line(me.itemID,msize);
-            }
-            else
-            {
-                msize = 4;
-            }
-
-
-            for(int j=parent.abseek+psize;j < parent.abseek+psize+msize;j ++)
-            {
-                abfile.RemoveLine(j);
-            }
-            if(me.type == NIT_NOTE)
-            {
-                wxRemoveFile(me.path);
-            }
-            else
-            {
-                remove_dir(me.itemID);
-            }
+                f.GetPrevLine();
+            NoteRecord record;
+            vector<NoteRecord>::iterator it;
+            f >> record;
+            //wxMessageBox(record.getItemTitle(), _T("!"));
+            m_noteRecords.push_back(record);
+            it = m_noteRecords.end(); it--;
+            m_itemIdMap.insert(map<int, int>::value_type(record.getItemId(), m_noteRecords.size() - 1));
         }
+        f.Close();
     }
     abfile.Write();
     abfile.Close();
 }
+
+void NoteFileHandler::saveItemTree()
+{
+    wxTextFile f(wxString::Format(_T("%s/%s"), m_cfgDir, CONFIG_FILE));
+    f.Create();
+    f.AddLine(wxString::Format(_T("%d"), m_autoIncId));
+    /* skip the ROOT! */
+    for (vector<NoteRecord>::iterator it = m_noteRecords.begin() + 1; it != m_noteRecords.end(); it++)
+        if (it->isValid()) /* ignore all invalid nodes! */
+            f << *it;
+    f.Write();
+    f.Close();
+}
+

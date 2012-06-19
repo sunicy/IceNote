@@ -5,9 +5,10 @@
 #include "NoteRelation.h"
 #include "NoteItemAbstract.h"
 #include "Notetraverser.h"
-#include<fstream>
-#include<vector>
-#include<wx/dir.h>
+
+#include <vector>
+#include <map>
+
 #include <wx/file.h>
 #include <wx/textfile.h>
 #include <wx/filefn.h>
@@ -15,7 +16,7 @@
 #include <wx/datetime.h>
 #include <wx/richtext/richtextctrl.h>
 
-using std::vector;
+using namespace std;
 
 /* This is the core class concerning all file-handling of
     IceNote.
@@ -27,10 +28,36 @@ using std::vector;
     This class is a singleton. To simplify the programming
     procedure, we just leave it a member variable in Main class.
 */
-class listnode
+/* stores a single record from config file */
+class NoteRecord
 {
     public:
+        NoteRecord();
+        /* for a notebook */
+        NoteRecord(NoteItemType noteItemType, int itemId, int parentId, wxString notebookTitle);
+        /* for a note */
+        NoteRecord(NoteItemType noteItemType, int itemId, int parentId, const NoteItemAbstract& abstract);
 
+        /* some get info */
+        NoteItemType getItemType();
+        wxString getItemTitle();/* both for note and notebook */
+        int getItemId();
+        int getParentId();
+        NoteRelation getRelationWithParent(); /* both */
+        NoteItemAbstract getAbstract();/* only for notes */
+        wxString getNoteFilename(); /* only for notes, returns the filename without FULL PATH */
+
+        /* set info */
+        void setItemType(NoteItemType noteItemType);
+        void setItemTitle(wxString title); /* ONLY for NOTEBOOK */
+        void setItemId(int itemId);
+        void setParentId(int parentId);
+        void setAbstract(NoteItemAbstract& abstract); /* only for note */
+
+        void setValid(bool valid);
+        bool isValid();
+
+<<<<<<< HEAD:NoteBaseFileHandler.h
     listnode(int itemID,int parentID,int abseek,wxString path,NoteItemAbstract& abst,NoteItemType type,int modified = 0):abstract(abst)
     {
         this->itemID = itemID;
@@ -56,16 +83,27 @@ class listnode
         wxString path;
         NoteItemAbstract abstract;
         NoteItemType type;
+=======
+    private:
+        NoteItemType m_itemType;
+        int m_itemId;
+        int m_paretnId;
+        bool m_valid; /* whether this item is in use */
+        NoteItemAbstract m_abstract;
+        wxString m_notebookTitle; /* ONLY USED if it is a NOTEBOOK! */
+>>>>>>> SimpleFileHandler:NoteFileHandler.h
 };
 
-WX_DECLARE_OBJARRAY(listnode,nodearray);
-WX_DECLARE_OBJARRAY(NoteRelation,relationarray);
+/* for output */
+wxTextFile& operator<<(wxTextFile& file, NoteRecord& noteRecord);
+/* for input */
+wxTextFile& operator>>(wxTextFile& file, NoteRecord& noteRecord);
 
 class NoteFileHandler
 {
     public:
         NoteFileHandler(wxString docDir);
-        virtual ~NoteFileHandler();
+        ~NoteFileHandler();
 
     /*
         PART I: Building Trees
@@ -87,10 +125,9 @@ class NoteFileHandler
         bool getNoteAbstract(int itemId, NoteItemAbstract& itemAbstract);
 
         /* get the notebook title, specifying the ItemId; returns -1 if failed */
-        wxString getNotebookTitle(int itemId);
         wxString getItemTitle(int itemId);
 
-        bool setNoteAbstract(int itemId, const NoteItemAbstract& itemAbstract);
+        bool setNoteAbstract(int itemId, NoteItemAbstract& itemAbstract);
 
     /*
         PART III: Taking actions */
@@ -111,6 +148,7 @@ class NoteFileHandler
         bool saveNote(int itemId, wxRichTextCtrl& textCtrl);
         bool openNote(int itemId, wxRichTextCtrl& textCtrl);
 
+<<<<<<< HEAD:NoteBaseFileHandler.h
         /**/
         void init_tree(listnode& t);
         void get_all_item(wxString& path,wxArrayString& files);
@@ -121,16 +159,25 @@ class NoteFileHandler
         void reset_config(listnode& r);
         //void insert_abstract(listnode& r);
 
+=======
+>>>>>>> SimpleFileHandler:NoteFileHandler.h
     protected:
     private:
-        //wxDIR default_dir;
-        vector<listnode> tree;
-        vector<NoteRelation> relation;
-        wxTextFile abfile;      /*the file include all the abstract content*/
-        int abseek;       /*global var for the seek in abfile*/
-        int current_re_id;  /*the id of the relation we get*/
-        int id;     /*auto increase*/
-        wxString current_path;/* our work path*/
+        /* stores all the records in a linear list */
+        vector<NoteRecord> m_noteRecords;
+        /* from ItemId to the record! */
+        map<int, int> m_itemIdMap;
+        wxTextFile m_cfgFile;      /*the file include all the abstract content*/
+
+        int m_currentRelationPos; /* used for "restartRelation" and "nextRelation" */
+        int m_autoIncId;           /* the next ItemId */
+        wxString m_cfgDir; /* working dir! */
+
+        void loadItemTree();
+        void saveItemTree();
+
+        /* delete the item recursively */
+        bool _deleteItem(int itemId);
 };
 
 #endif // NOTEFILEHANDLER_H

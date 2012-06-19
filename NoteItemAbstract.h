@@ -15,12 +15,13 @@ class NoteItemAbstract
         NoteItemAbstract(wxString title, wxString tags, wxDateTime createdTime, wxDateTime lastModified);
 
         /* get them! */
-        wxString getTitle()const;
-        wxString getTags()const;
-        wxDateTime getCreatedTime()const;
-        wxDateTime getLastModified()const;
+        wxString getTitle();
+        wxString getTags();
+        wxDateTime getCreatedTime();
+        wxDateTime getLastModified();
 
         void setTitile(wxString title);
+        void setTitle(wxString title);
         void setTags(wxString tags);
         void setCreateTime(wxDateTime time);
         void setLastModified(wxDateTime time);
