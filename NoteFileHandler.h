@@ -73,7 +73,7 @@ class NoteFileHandler
 {
     public:
         NoteFileHandler(wxString docDir);
-        virtual ~NoteFileHandler();
+        ~NoteFileHandler();
 
     /*
         PART I: Building Trees

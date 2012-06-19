@@ -22,6 +22,7 @@
 #include <map>
 #include <wx/textdlg.h>
 #include <wx/richtext/richtextformatdlg.h>
+#include <wx/imaglist.h>
 
 using namespace std;
 
@@ -287,14 +288,15 @@ IceNoteFrame::IceNoteFrame(wxWindow* parent,wxWindowID id)
     Connect(wxID_ANY, wxEVT_CLOSE_WINDOW, (wxObjectEventFunction)&IceNoteFrame::OnClose);
     //[STOP]*)
     m_richTextCtrl->SetFocus();
-    //SplitterWindow1->Enable(false);
+    SplitterWindow1->Enable(false);
 
     /* Bind the OnSelChanged */
     Connect(ID_TREECTRL,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&IceNoteFrame::OnSelChanged);
 
     buildNoteTreeFromFileHandler();
+    loadAndShowAbstract(0);
 
-    wxDir dir(wxGetCwd());
+    /*wxDir dir(wxGetCwd());
     wxArrayString files;
     wxString t;
     dir.GetFirst(&t, wxEmptyString, wxDIR_DIRS);
@@ -305,7 +307,7 @@ IceNoteFrame::IceNoteFrame(wxWindow* parent,wxWindowID id)
     } while (dir.GetNext(&t));
 
     SplitterWindow1->Enable(true);
-    m_richTextCtrl->SaveFile(_T("d:\\test.xml"));
+    m_richTextCtrl->SaveFile(_T("d:\\test.xml"));*/
 }
 
 IceNoteFrame::~IceNoteFrame()
@@ -331,6 +333,7 @@ void IceNoteFrame::OnClose(wxCloseEvent& event)
     if (m_currentNoteItemId > 0)
     {
         saveAbstract(m_currentNoteItemId);
+        m_fileHandler->saveNote(m_currentNoteItemId, *m_richTextCtrl);
     }
     delete m_fileHandler;
     event.Veto();
@@ -442,8 +445,14 @@ void IceNoteFrame::OnCreateNote(wxCommandEvent& event)
     {
         i = noteTree->AppendItem(i, _T("Unnamed note"), 1, 1, new NoteTreeItemData(itemId, NIT_NOTE));
         /* init abstarct and save it! */
-        m_currentAbstract = NoteItemAbstract(wxEmptyString, wxEmptyString, wxDateTime::Now(), wxDateTime::Now());
+        loadAndShowAbstract(0);
+        m_currentAbstract = NoteItemAbstract(_T("Unnamed note"), wxEmptyString, wxDateTime::Now(), wxDateTime::Now());
         saveAbstract(itemId);
+        /* clear all things! */
+        m_richTextCtrl->Clear();
+        m_fileHandler->saveNote(itemId, *m_richTextCtrl);
+
+        //m_currentNoteItemId = itemId;
         noteTree->SelectItem(i);
         noteTree->SetFocus();
     }
@@ -571,26 +580,28 @@ void IceNoteFrame::OnSelChanged(wxTreeEvent& event)
 {
     wxTreeItemId i = event.GetItem();
     NoteTreeItemData *item = (NoteTreeItemData*)noteTree->GetItemData(i);
+    if (m_currentNoteItemId == item->getItemId()) /* if not changed */
+        return;
+    /* STEP1: Save the past one */
+    if (m_currentNoteItemId > 0) /* if the prev is a note */
+    {
+        saveAbstract(m_currentNoteItemId);
+        m_fileHandler->saveNote(m_currentNoteItemId, *m_richTextCtrl);
+        /* update the title! */
+        noteTree->SetItemText(event.GetOldItem(), m_fileHandler->getItemTitle(m_currentNoteItemId));
+    }
     /* if it is a note, save the past one and load the new one */
     if (item->getItemType() == NIT_NOTE)
     {
-        if (m_currentNoteItemId == item->getItemId()) /* if not changed */
-            return;
-        /* STEP1: Save the past one */
-        if (m_currentNoteItemId > 0) /* if the prev is a note */
-        {
-            saveAbstract(m_currentNoteItemId);
-            m_fileHandler->saveNote(m_currentNoteItemId, *m_richTextCtrl);
-        }
         /* STEP2: Set and load the new one */
         m_currentNoteItemId = item->getItemId();
         m_fileHandler->openNote(m_currentNoteItemId, *m_richTextCtrl);
-        loadAndShowAbstract(m_currentNoteItemId);
     }
+    else
+        m_currentNoteItemId = 0; /* it's a notebook! */
 
     SplitterWindow1->Enable(m_currentNoteItemId != 0);
-    if (m_currentNoteItemId == 0)
-        loadAndShowAbstract(0);
+    loadAndShowAbstract(m_currentNoteItemId);
 }
 
 void IceNoteFrame::loadAndShowAbstract(int itemId)
@@ -609,6 +620,7 @@ void IceNoteFrame::loadAndShowAbstract(int itemId)
         m_edtTags->SetValue("");
         m_edtCreatedTime->SetValue("");
         m_edtLastModified->SetValue("");
+        m_richTextCtrl->Clear();
     }
 }
 

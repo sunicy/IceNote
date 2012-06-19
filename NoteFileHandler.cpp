@@ -121,7 +121,7 @@ wxTextFile& operator<<(wxTextFile& file, NoteRecord& noteRecord)
         file.AddLine(noteRecord.getItemTitle());
     else /* note: save the abstract! */
     {
-        NoteItemAbstract abstract(noteRecord.getAbstract());
+        NoteItemAbstract abstract = noteRecord.getAbstract();
         file.AddLine(abstract.getTitle());
         file.AddLine(abstract.getTags());
         file.AddLine(abstract.getCreatedTime().Format());
@@ -151,6 +151,7 @@ wxTextFile& operator>>(wxTextFile& file, NoteRecord& noteRecord)
         abstract.setCreateTime(dt);
         dt.ParseDateTime(file.GetNextLine());
         abstract.setLastModified(dt);
+        noteRecord.setAbstract(abstract);
     }
     return file;
 }
@@ -163,6 +164,7 @@ NoteFileHandler::NoteFileHandler(wxString docDir) : m_cfgDir(docDir)
 
 NoteFileHandler::~NoteFileHandler()
 {
+    saveItemTree();
 }
 
 void NoteFileHandler::restartRelations()
@@ -212,6 +214,7 @@ bool NoteFileHandler::setNoteAbstract(int itemId, NoteItemAbstract& itemAbstract
     if (it == m_itemIdMap.end()) /* if not found! */
         return false;
     m_noteRecords[it->second].setAbstract(itemAbstract);
+    //saveItemTree();
 }
 
 int NoteFileHandler::createNote(int parentId)
@@ -227,7 +230,7 @@ int NoteFileHandler::createNote(int parentId)
     m_noteRecords.push_back(r);
     m_itemIdMap.insert(map<int, int>::value_type(r.getItemId(), m_noteRecords.size() - 1));
     m_autoIncId++;
-    saveItemTree(); /* save it ! */
+    //saveItemTree(); /* save it ! */
     return m_autoIncId - 1;
 }
 
@@ -245,14 +248,14 @@ int NoteFileHandler::createNotebook(wxString notebookTitle, int parentId)
     m_noteRecords.push_back(r);
     m_itemIdMap.insert(map<int, int>::value_type(r.getItemId(), m_noteRecords.size() - 1));
     m_autoIncId++;
-    saveItemTree(); /* save it! */
+    //saveItemTree(); /* save it! */
     return m_autoIncId - 1;
 }
 
 bool NoteFileHandler::deleteItem(int itemId)
 {
     bool f = _deleteItem(itemId);
-    saveItemTree();
+    //saveItemTree();
     return f;
 }
 
@@ -283,11 +286,19 @@ bool NoteFileHandler::_deleteItem(int itemId)
 
 bool NoteFileHandler::saveNote(int itemId, wxRichTextCtrl& textCtrl)
 {
+    map<int, int>::iterator it = m_itemIdMap.find(itemId);
+    if (it == m_itemIdMap.end())
+        return false; /* invalid! */
+    textCtrl.SaveFile(wxString::Format(_T("%s/%s"), m_cfgDir, m_noteRecords[it->second].getNoteFilename()), wxRICHTEXT_TYPE_XML);
     return true;
 }
 
 bool NoteFileHandler::openNote(int itemId, wxRichTextCtrl& textCtrl)
 {
+    map<int, int>::iterator it = m_itemIdMap.find(itemId);
+    if (it == m_itemIdMap.end())
+        return false; /* invalid! */
+    textCtrl.LoadFile(wxString::Format(_T("%s/%s"), m_cfgDir, m_noteRecords[it->second].getNoteFilename()), wxRICHTEXT_TYPE_XML);
     return true;
 }
 
@@ -301,16 +312,24 @@ void NoteFileHandler::loadItemTree()
     m_noteRecords.push_back(r);
     wxTextFile f(wxString::Format(_T("%s/%s"), m_cfgDir, CONFIG_FILE));
     m_autoIncId = 1; /* never be ZERO! cuz root = zero */
+
     if (wxFile::Exists(f.GetName())) /* if exists, open & parse it */
     {
         f.Open();
+        //f.GetFirstLine();
         /* parse it! */
-        m_autoIncId = wxAtoi(f.GetNextLine());
+        m_autoIncId = wxAtoi(f.GetFirstLine());
+
         while (!f.Eof())
         {
+            if (f.GetNextLine() == wxEmptyString)
+                break; /* empty line! */
+            else
+                f.GetPrevLine();
             NoteRecord record;
             vector<NoteRecord>::iterator it;
             f >> record;
+            //wxMessageBox(record.getItemTitle(), _T("!"));
             m_noteRecords.push_back(record);
             it = m_noteRecords.end(); it--;
             m_itemIdMap.insert(map<int, int>::value_type(record.getItemId(), m_noteRecords.size() - 1));

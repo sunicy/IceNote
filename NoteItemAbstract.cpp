@@ -19,22 +19,22 @@ NoteItemAbstract::NoteItemAbstract(wxString title, wxString tags, wxDateTime cre
     m_lastModified = lastModified;
 }
 
-wxString NoteItemAbstract::getTitle()const
+wxString NoteItemAbstract::getTitle()
 {
     return m_title;
 }
 
-wxString NoteItemAbstract::getTags()const
+wxString NoteItemAbstract::getTags()
 {
     return m_tags;
 }
 
-wxDateTime NoteItemAbstract::getCreatedTime()const
+wxDateTime NoteItemAbstract::getCreatedTime()
 {
     return m_createdTime;
 }
 
-wxDateTime NoteItemAbstract::getLastModified()const
+wxDateTime NoteItemAbstract::getLastModified()
 {
     return m_lastModified;
 }
