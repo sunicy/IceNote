@@ -445,16 +445,12 @@ void IceNoteFrame::OnCreateNote(wxCommandEvent& event)
     {
         i = noteTree->AppendItem(i, _T("Unnamed note"), 1, 1, new NoteTreeItemData(itemId, NIT_NOTE));
         /* init abstarct and save it! */
-        loadAndShowAbstract(0);
         m_currentAbstract = NoteItemAbstract(_T("Unnamed note"), wxEmptyString, wxDateTime::Now(), wxDateTime::Now());
         saveAbstract(itemId);
         /* clear all things! */
-        m_richTextCtrl->Clear();
-        m_fileHandler->saveNote(itemId, *m_richTextCtrl);
-
-        //m_currentNoteItemId = itemId;
         noteTree->SelectItem(i);
         noteTree->SetFocus();
+
     }
     else
         wxMessageBox(_T("Error occured while creating a new note."), PROG_TITLE);
@@ -627,14 +623,14 @@ void IceNoteFrame::loadAndShowAbstract(int itemId)
 void IceNoteFrame::saveAbstract(int itemId)
 {
     if (m_edtTitle->GetValue().IsEmpty())
-        m_edtTitle->SetValue(_T("Unnamed Note"));
+        m_edtTitle->SetValue(_T("Unnamed note"));
 
     wxDateTime lastModifiedTime = wxDateTime::Now();
     m_edtLastModified->SetValue(lastModifiedTime.Format());
     NoteItemAbstract abstract(m_edtTitle->GetValue(),
                               m_edtTags->GetValue(),
                               m_currentAbstract.getCreatedTime(),
-                              lastModifiedTime);
+                              m_richTextCtrl->IsModified() ? lastModifiedTime : m_currentAbstract.getLastModified());
     m_currentAbstract = abstract;
     m_fileHandler->setNoteAbstract(itemId, m_currentAbstract);
 }
