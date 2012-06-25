@@ -2030,7 +2030,7 @@
 	"wx/defs.h"
 	"wx/dialog.h"
 
-1340083469 source:i:\icenote\resource.rc
+1340459252 source:i:\icenote\resource.rc
 	"wx/msw/wx.rc"
 
 1309417918 i:\wxwidgets2.8\include\wx\msw\wx.rc
@@ -8893,12 +8893,12 @@
 	"wx/defs.h"
 	"wx/window.h"
 
-1340111744 source:i:\icenote\notefilehandler.cpp
+1340459252 source:i:\icenote\notefilehandler.cpp
 	"NoteFileHandler.h"
 	<wx/filename.h>
 	<vector>
 
-1340111713 i:\icenote\notefilehandler.h
+1340112946 i:\icenote\notefilehandler.h
 	"NoteRelation.h"
 	"NoteItemAbstract.h"
 	"Notetraverser.h"
@@ -8912,12 +8912,12 @@
 
 1340083469 i:\icenote\noterelation.h
 
-1340109199 i:\icenote\noteitemabstract.h
+1340112754 i:\icenote\noteitemabstract.h
 	<wx/string.h>
 	<wx/datetime.h>
 	<wx/richtext/richtextctrl.h>
 
-1340109190 source:i:\icenote\noteitemabstract.cpp
+1340112754 source:i:\icenote\noteitemabstract.cpp
 	"NoteItemAbstract.h"
 
 1340083469 source:i:\icenote\noterelation.cpp
