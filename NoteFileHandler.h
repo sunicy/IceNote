@@ -16,6 +16,8 @@
 
 using namespace std;
 
+#define DATETIME_FORMAT _T("%Y-%m-%d %H:%M:%S")
+
 /* This is the core class concerning all file-handling of
     IceNote.
     The whole class could be divided into 3 parts:

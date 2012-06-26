@@ -683,8 +683,8 @@ void IceNoteFrame::loadAndShowAbstract(int itemId)
         m_fileHandler->getNoteAbstract(itemId, m_currentAbstract);
         m_edtTitle->SetValue(m_currentAbstract.getTitle());
         m_edtTags->SetValue(m_currentAbstract.getTags());
-        m_edtCreatedTime->SetValue(m_currentAbstract.getCreatedTime().Format());
-        m_edtLastModified->SetValue(m_currentAbstract.getLastModified().Format());
+        m_edtCreatedTime->SetValue(m_currentAbstract.getCreatedTime().Format(DATETIME_FORMAT));
+        m_edtLastModified->SetValue(m_currentAbstract.getLastModified().Format(DATETIME_FORMAT));
     }
     else
     {
@@ -702,7 +702,7 @@ void IceNoteFrame::saveAbstract(int itemId)
         m_edtTitle->SetValue(_T("Unnamed note"));
 
     wxDateTime lastModifiedTime = wxDateTime::Now();
-    m_edtLastModified->SetValue(lastModifiedTime.Format());
+    m_edtLastModified->SetValue(lastModifiedTime.Format(DATETIME_FORMAT));
     NoteItemAbstract abstract(m_edtTitle->GetValue(),
                               m_edtTags->GetValue(),
                               m_currentAbstract.getCreatedTime(),

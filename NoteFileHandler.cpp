@@ -112,7 +112,6 @@ bool NoteRecord::isValid()
     ]
 */
 
-
 wxTextFile& operator<<(wxTextFile& file, NoteRecord& noteRecord)
 {
     /* Basic common info */
@@ -127,8 +126,8 @@ wxTextFile& operator<<(wxTextFile& file, NoteRecord& noteRecord)
         NoteItemAbstract abstract = noteRecord.getAbstract();
         file.AddLine(abstract.getTitle());
         file.AddLine(abstract.getTags());
-        file.AddLine(abstract.getCreatedTime().Format());
-        file.AddLine(abstract.getLastModified().Format());
+        file.AddLine(abstract.getCreatedTime().Format(DATETIME_FORMAT));
+        file.AddLine(abstract.getLastModified().Format(DATETIME_FORMAT));
     }
     /* write back! */
     file.Write();
