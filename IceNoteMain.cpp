@@ -594,7 +594,10 @@ void IceNoteFrame::OnSelChanged(wxTreeEvent& event)
         saveAbstract(m_currentNoteItemId);
         m_fileHandler->saveNote(m_currentNoteItemId, *m_richTextCtrl);
         /* update the title! */
-        noteTree->SetItemText(event.GetOldItem(), m_fileHandler->getItemTitle(m_currentNoteItemId));
+        wxTreeItemId it = event.GetOldItem();
+        NoteTreeItemData* it_data = (NoteTreeItemData*)(noteTree->GetItemData(it));
+        if (it_data->getItemType() == NIT_NOTE)
+            noteTree->SetItemText(event.GetOldItem(), m_fileHandler->getItemTitle(m_currentNoteItemId));
     }
     /* if it is a note, save the past one and load the new one */
     if (item->getItemType() == NIT_NOTE)
