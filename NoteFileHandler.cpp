@@ -8,13 +8,16 @@ using namespace std;
 
 NoteRecord::NoteRecord(NoteItemType noteItemType, int itemId, int parentId, wxString notebookTitle) :
     m_itemType(noteItemType), m_itemId(itemId), m_paretnId(parentId), m_notebookTitle(notebookTitle), m_valid(true)
-{}
+{
+}
 
 NoteRecord::NoteRecord(NoteItemType noteItemType, int itemId, int parentId, const NoteItemAbstract& abstract) :
     m_itemType(noteItemType), m_itemId(itemId), m_paretnId(parentId),m_abstract(abstract), m_valid(true)
-{}
+{
+}
 NoteRecord::NoteRecord() : m_valid(true)
-{}
+{
+}
 
 NoteItemType NoteRecord::getItemType()
 {
@@ -298,7 +301,10 @@ bool NoteFileHandler::openNote(int itemId, wxRichTextCtrl& textCtrl)
     map<int, int>::iterator it = m_itemIdMap.find(itemId);
     if (it == m_itemIdMap.end())
         return false; /* invalid! */
-    textCtrl.LoadFile(wxString::Format(_T("%s/%s"), m_cfgDir, m_noteRecords[it->second].getNoteFilename()), wxRICHTEXT_TYPE_XML);
+    if (wxFile::Exists(wxString::Format(_T("%s/%s"), m_cfgDir, m_noteRecords[it->second].getNoteFilename())))
+        textCtrl.LoadFile(wxString::Format(_T("%s/%s"), m_cfgDir, m_noteRecords[it->second].getNoteFilename()), wxRICHTEXT_TYPE_XML);
+    else
+        textCtrl.Clear();
     return true;
 }
 

@@ -94,13 +94,19 @@ const long IceNoteFrame::ID_UNDERLINE = wxNewId();
 const long IceNoteFrame::ID_TOOLBAR1 = wxNewId();
 //*)
 
+/* FIRST: check whether RichTextCtrl is available */
+#define EVT_UPDATE_UI_TEXT_BASED(id, proc) EVT_UPDATE_UI(id, IceNoteFrame::OnUpdateRichTextCtrlEnabled) \
+                                            EVT_UPDATE_UI(id, proc)
+
 BEGIN_EVENT_TABLE(IceNoteFrame,wxFrame)
     EVT_MENU(ID_NEW_NOTEBOOK,  IceNoteFrame::OnCreateNotebook)
     EVT_MENU(ID_NEW_NOTE,  IceNoteFrame::OnCreateNote)
 
-    EVT_UPDATE_UI(ID_BOLD,  IceNoteFrame::OnUpdateBold)
-    EVT_UPDATE_UI(ID_ITALIC,  IceNoteFrame::OnUpdateItalic)
-    EVT_UPDATE_UI(ID_UNDERLINE,  IceNoteFrame::OnUpdateUnderline)
+    EVT_UPDATE_UI(wxID_UNDO, IceNoteFrame::OnUpdateRichTextCtrlEnabled)
+    EVT_UPDATE_UI(wxID_REDO, IceNoteFrame::OnUpdateRichTextCtrlEnabled)
+    EVT_UPDATE_UI_TEXT_BASED(ID_BOLD,  IceNoteFrame::OnUpdateBold)
+    EVT_UPDATE_UI_TEXT_BASED(ID_ITALIC,  IceNoteFrame::OnUpdateItalic)
+    EVT_UPDATE_UI_TEXT_BASED(ID_UNDERLINE,  IceNoteFrame::OnUpdateUnderline)
     EVT_MENU(ID_BOLD,  IceNoteFrame::OnBold)
     EVT_MENU(ID_ITALIC,  IceNoteFrame::OnItalic)
     EVT_MENU(ID_UNDERLINE,  IceNoteFrame::OnUnderline)
@@ -109,12 +115,29 @@ BEGIN_EVENT_TABLE(IceNoteFrame,wxFrame)
     EVT_MENU(ID_TEXT_ALIGNMENT_CENTER,  IceNoteFrame::OnAlignCentre)
     EVT_MENU(ID_TEXT_ALIGNMENT_RIGHT,  IceNoteFrame::OnAlignRight)
 
-    EVT_UPDATE_UI(ID_TEXT_ALIGNMENT_LEFT,  IceNoteFrame::OnUpdateAlignLeft)
-    EVT_UPDATE_UI(ID_TEXT_ALIGNMENT_CENTER,  IceNoteFrame::OnUpdateAlignCentre)
-    EVT_UPDATE_UI(ID_TEXT_ALIGNMENT_RIGHT,  IceNoteFrame::OnUpdateAlignRight)
+    EVT_UPDATE_UI_TEXT_BASED(ID_TEXT_ALIGNMENT_LEFT,  IceNoteFrame::OnUpdateAlignLeft)
+    EVT_UPDATE_UI_TEXT_BASED(ID_TEXT_ALIGNMENT_CENTER,  IceNoteFrame::OnUpdateAlignCentre)
+    EVT_UPDATE_UI_TEXT_BASED(ID_TEXT_ALIGNMENT_RIGHT,  IceNoteFrame::OnUpdateAlignRight)
 
     EVT_MENU(ID_DEL_NOTE,  IceNoteFrame::OnDelNote)
     EVT_MENU(ID_STYLESHEET,  IceNoteFrame::OnStyleSheet)
+    EVT_UPDATE_UI(ID_STYLESHEET, IceNoteFrame::OnUpdateRichTextCtrlEnabled)
+
+    /* Add picture */
+    EVT_MENU(ID_ADD_PIC, IceNoteFrame::OnAddPicture)
+    EVT_UPDATE_UI(ID_ADD_PIC, IceNoteFrame::OnUpdateRichTextCtrlEnabled)
+
+    /* Something about CLIPBOARD */
+    /* FIRST: is RichTextCtrl available? SECOND: well, let's look at the clipboard */
+    EVT_MENU(ID_CUT, IceNoteFrame::OnCut)
+    EVT_UPDATE_UI_TEXT_BASED(ID_CUT, IceNoteFrame::OnUpdateCutCopy)
+    EVT_MENU(ID_COPY, IceNoteFrame::OnCopy)
+    EVT_UPDATE_UI_TEXT_BASED(ID_COPY, IceNoteFrame::OnUpdateCutCopy)
+    EVT_MENU(ID_PASTE, IceNoteFrame::OnPaste)
+    EVT_UPDATE_UI_TEXT_BASED(ID_PASTE, IceNoteFrame::OnUpdatePaste)
+
+    EVT_MENU(ID_SELALL, IceNoteFrame::OnSelAll)
+    EVT_UPDATE_UI_TEXT_BASED(ID_SELALL, IceNoteFrame::OnUpdateRichTextCtrlEnabled)
 
     EVT_TREE_SEL_CHANGED(ID_TREECTRL, IceNoteFrame::OnSelChanged)
     //(*EventTable(IceNoteFrame)
@@ -296,22 +319,8 @@ IceNoteFrame::IceNoteFrame(wxWindow* parent,wxWindowID id)
     buildNoteTreeFromFileHandler();
     loadAndShowAbstract(0);
 
-    /*wxDir dir(wxGetCwd());
-    wxArrayString files;
-    wxString t;
-    dir.GetFirst(&t, wxEmptyString, wxDIR_DIRS);
-    do
-    {
-        m_richTextCtrl->AppendText(t);
-        m_richTextCtrl->AppendText(_T("\n"));
-    } while (dir.GetNext(&t));
-
-    SplitterWindow1->Enable(true);
-<<<<<<< HEAD
-    m_richTextCtrl->SaveFile(_T("d:\\test.xml"));
-=======
-    m_richTextCtrl->SaveFile(_T("d:\\test.xml"));*/
->>>>>>> SimpleFileHandler
+    /* expand the treelist */
+    noteTree->Expand(noteTree->GetRootItem());
 }
 
 IceNoteFrame::~IceNoteFrame()
@@ -334,10 +343,8 @@ void IceNoteFrame::OnAbout(wxCommandEvent& event)
 void IceNoteFrame::OnClose(wxCloseEvent& event)
 {
     /* if fun's over, save it! */
-    wxMessageBox("close","close");
     if (m_currentNoteItemId > 0)
     {
-        m_fileHandler->saveNote(m_currentNoteItemId, *m_richTextCtrl);
         saveAbstract(m_currentNoteItemId);
         m_fileHandler->saveNote(m_currentNoteItemId, *m_richTextCtrl);
     }
@@ -451,16 +458,12 @@ void IceNoteFrame::OnCreateNote(wxCommandEvent& event)
     {
         i = noteTree->AppendItem(i, _T("Unnamed note"), 1, 1, new NoteTreeItemData(itemId, NIT_NOTE));
         /* init abstarct and save it! */
-        loadAndShowAbstract(0);
         m_currentAbstract = NoteItemAbstract(_T("Unnamed note"), wxEmptyString, wxDateTime::Now(), wxDateTime::Now());
         saveAbstract(itemId);
         /* clear all things! */
-        m_richTextCtrl->Clear();
-        m_fileHandler->saveNote(itemId, *m_richTextCtrl);
-
-        //m_currentNoteItemId = itemId;
         noteTree->SelectItem(i);
         noteTree->SetFocus();
+
     }
     else
         wxMessageBox(_T("Error occured while creating a new note."), PROG_TITLE);
@@ -563,6 +566,68 @@ void IceNoteFrame::OnDelNote(wxCommandEvent& WXUNUSED(event))
     }
 }
 
+void IceNoteFrame::OnAddPicture(wxCommandEvent& WXUNUSED(event))
+{
+    wxFileDialog fdlg(this, _("Choose a picture..."), wxEmptyString, wxEmptyString,
+                      _("All graphic file|*.png;*.jpg|JPEG file|*.jpg|PNG file|*.png"), wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+    if (fdlg.ShowModal() == wxID_OK)
+    {
+        /* add the picture ! */
+        wxImage img;
+        /* bad picture */
+        if (!img.LoadFile(fdlg.GetPath()))
+        {
+            wxMessageBox(_T("Unrecognized graphic file."), PROG_TITLE);
+            return;
+        }
+
+        m_richTextCtrl->WriteImage(img);
+    }
+}
+
+void IceNoteFrame::OnUpdateAddPicture(wxUpdateUIEvent& event)
+{
+    event.Enable(m_richTextCtrl->IsEnabled());
+}
+
+void IceNoteFrame::OnUpdateRichTextCtrlEnabled(wxUpdateUIEvent& event)
+{
+    event.Enable(m_richTextCtrl->IsEnabled());
+}
+
+void IceNoteFrame::OnCut(wxCommandEvent& WXUNUSED(event))
+{
+    if (m_richTextCtrl->CanCut())
+        m_richTextCtrl->Cut();
+}
+
+void IceNoteFrame::OnCopy(wxCommandEvent& WXUNUSED(event))
+{
+    if (m_richTextCtrl->CanCopy())
+        m_richTextCtrl->Copy();
+}
+
+void IceNoteFrame::OnUpdateCutCopy(wxUpdateUIEvent& event)
+{
+    event.Enable(m_richTextCtrl->CanCopy());
+}
+
+void IceNoteFrame::OnPaste(wxCommandEvent& event)
+{
+    if (m_richTextCtrl->CanPaste())
+        m_richTextCtrl->Paste();
+}
+
+void IceNoteFrame::OnUpdatePaste(wxUpdateUIEvent& event)
+{
+    event.Enable(m_richTextCtrl->CanPaste());
+}
+
+void IceNoteFrame::OnSelAll(wxCommandEvent& event)
+{
+    m_richTextCtrl->SelectAll();
+}
+
 void IceNoteFrame::OnStyleSheet(wxCommandEvent& WXUNUSED(event))
 {
     wxRichTextRange range;
@@ -594,10 +659,7 @@ void IceNoteFrame::OnSelChanged(wxTreeEvent& event)
         saveAbstract(m_currentNoteItemId);
         m_fileHandler->saveNote(m_currentNoteItemId, *m_richTextCtrl);
         /* update the title! */
-        wxTreeItemId it = event.GetOldItem();
-        NoteTreeItemData* it_data = (NoteTreeItemData*)(noteTree->GetItemData(it));
-        if (it_data->getItemType() == NIT_NOTE)
-            noteTree->SetItemText(event.GetOldItem(), m_fileHandler->getItemTitle(m_currentNoteItemId));
+        noteTree->SetItemText(event.GetOldItem(), m_fileHandler->getItemTitle(m_currentNoteItemId));
     }
     /* if it is a note, save the past one and load the new one */
     if (item->getItemType() == NIT_NOTE)
@@ -611,6 +673,7 @@ void IceNoteFrame::OnSelChanged(wxTreeEvent& event)
 
     SplitterWindow1->Enable(m_currentNoteItemId != 0);
     loadAndShowAbstract(m_currentNoteItemId);
+    m_richTextCtrl->SetFocus();
 }
 
 void IceNoteFrame::loadAndShowAbstract(int itemId)
@@ -636,14 +699,14 @@ void IceNoteFrame::loadAndShowAbstract(int itemId)
 void IceNoteFrame::saveAbstract(int itemId)
 {
     if (m_edtTitle->GetValue().IsEmpty())
-        m_edtTitle->SetValue(_T("Unnamed Note"));
+        m_edtTitle->SetValue(_T("Unnamed note"));
 
     wxDateTime lastModifiedTime = wxDateTime::Now();
     m_edtLastModified->SetValue(lastModifiedTime.Format());
     NoteItemAbstract abstract(m_edtTitle->GetValue(),
                               m_edtTags->GetValue(),
                               m_currentAbstract.getCreatedTime(),
-                              lastModifiedTime);
+                              m_richTextCtrl->IsModified() ? lastModifiedTime : m_currentAbstract.getLastModified());
     m_currentAbstract = abstract;
     m_fileHandler->setNoteAbstract(itemId, m_currentAbstract);
 }
