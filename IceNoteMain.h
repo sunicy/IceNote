@@ -22,6 +22,7 @@
 #include <wx/richtext/richtextctrl.h>
 #include <wx/frame.h>
 #include <wx/statusbr.h>
+#include <wx/filedlg.h>
 //*)
 #include "NoteFileHandler.h"
 
@@ -195,6 +196,20 @@ class IceNoteFrame: public wxFrame
         void OnSelChanged(wxTreeEvent& event);
 
         void OnStyleSheet(wxCommandEvent& event);
+
+        void OnUpdateRichTextCtrlEnabled(wxUpdateUIEvent& event);
+
+        void OnAddPicture(wxCommandEvent& event);
+        void OnUpdateAddPicture(wxUpdateUIEvent& event);
+
+        /* Something about CLIPBOARD */
+        void OnCut(wxCommandEvent& event);
+        void OnCopy(wxCommandEvent& event);
+        void OnUpdateCutCopy(wxUpdateUIEvent& event);
+        void OnPaste(wxCommandEvent& event);
+        void OnUpdatePaste(wxUpdateUIEvent& event);
+
+        void OnSelAll(wxCommandEvent& event);
 
         void loadAndShowAbstract(int itemId);
         void saveAbstract(int itemId);
