@@ -2,4 +2,5 @@
 /obj
 *.depend
 /notes
+*.layout
 *.cbp
