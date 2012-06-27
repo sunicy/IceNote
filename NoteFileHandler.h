@@ -3,7 +3,6 @@
 
 #include "NoteRelation.h"
 #include "NoteItemAbstract.h"
-#include "Notetraverser.h"
 
 #include <vector>
 #include <map>
